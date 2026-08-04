@@ -1,0 +1,42 @@
+[gd_scene load_steps=3 format=3 uid="uid://projectile_scene"]
+
+[ext_resource type="Script" path="res://scripts/projectile.gd" id="1_proj_gd"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_col"]
+radius = 0.22
+
+[node name="Projectile" type="Area3D"]
+collision_layer = 4
+collision_mask = 3
+monitoring = true
+monitorable = false
+script = ExtResource("1_proj_gd")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_col")
+
+[node name="Visuals" type="Node3D" parent="."]
+
+[node name="Trail" type="GPUParticles3D" parent="."]
+amount = 96
+lifetime = 0.65
+one_shot = false
+explosiveness = 0.0
+randomness = 0.35
+local_coords = false
+draw_order = 1
+
+[node name="DetailTrail" type="GPUParticles3D" parent="."]
+amount = 36
+lifetime = 0.8
+one_shot = false
+explosiveness = 0.0
+randomness = 0.5
+local_coords = false
+draw_order = 1
+
+[node name="GlowLight" type="OmniLight3D" parent="."]
+light_color = Color(1, 0.42, 0.05, 1)
+light_energy = 2.2
+omni_range = 3.5
+shadow_enabled = false
