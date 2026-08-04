@@ -1,0 +1,10 @@
+# Godot-generated cache
+**/.godot/
+
+# Local duplicate backup created during cleanup
+**/.duplicate_backup/
+
+# OS/editor clutter
+Thumbs.db
+.DS_Store
+*.tmp
