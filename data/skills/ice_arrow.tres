@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/skill_data.gd" id="1_skill_data"]
+
+[resource]
+script = ExtResource("1_skill_data")
+skill_id = &"ice_arrow"
+display_name = "Ледяная стрела"
+description = "Наносит точечный урон и замедляет цель."
+hotbar_slot = 3
+damage = 45
+mana_cost = 20
+cooldown = 5.0
+max_range = 20.0
+cast_animation = &"mixamo/SpellCast"
+release_ratio = 0.5
+cast_speed = 1.5
+projectile_height = 1.1
+effect_type = &"ice"
+projectile_speed = 14.0
+projectile_lifetime = 5.0
+projectile_color = Color(0.4, 0.85, 1, 1)
+status_duration = 2.5
+status_potency = 0.35

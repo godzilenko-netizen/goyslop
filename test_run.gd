@@ -39,9 +39,9 @@ func _run() -> void:
 			if child is CollisionShape3D:
 				collision_count += 1
 		_check(collision_count == 1, "Troll must have exactly one collision shape")
-		troll.state = "CIRCLING"
+		troll.state = troll.State.CIRCLING
 		troll._process_circling(0.016, troll.aggro_range - 0.1, Vector3.FORWARD)
-		_check(troll.state == "AGGRO", "Troll must aggro when player is too close")
+		_check(troll.state == troll.State.AGGRO, "Troll must aggro when player is too close")
 		troll.apply_burn(1.0, 0)
 		troll.apply_freeze(0.1, 0.5)
 		await create_timer(0.2).timeout
@@ -49,6 +49,17 @@ func _run() -> void:
 		troll.process_mode = Node.PROCESS_MODE_DISABLED
 
 	if player:
+		_check(player.get_script() != null, "Player script must parse and load")
+		_check(player.stats != null, "PlayerStats component is missing")
+		_check(player.fireball_skill.max_range == 15.0, "Fireball range must come from SkillData")
+		_check(player.ice_arrow_skill.status_duration == 2.5, "Ice duration must come from SkillData")
+		_check(player.hud.skill2_tooltip != null and player.hud.skill3_tooltip != null, "HUD skill cards must be generated from SkillData")
+		var hp_before: int = player.stats.current_hp
+		player.take_damage(10)
+		_check(player.stats.current_hp == hp_before - 10, "Damage must be owned by PlayerStats")
+		_check(int(player.hud.hp_orb.value) == player.stats.current_hp, "HUD health must update through PlayerStats signal")
+		player.restore_health_to_full()
+		_check(player.stats.current_hp == player.stats.max_hp, "Public health restore must update PlayerStats")
 		var inventory = player.get_node_or_null("InventoryUI")
 		_check(inventory != null, "InventoryUI is missing")
 		if inventory:

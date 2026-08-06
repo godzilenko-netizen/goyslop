@@ -1,4 +1,7 @@
 extends CanvasLayer
+class_name GameHUD
+
+const SkillDataType = preload("res://scripts/data/skill_data.gd")
 
 @onready var hp_orb: TextureProgressBar = $Control/HPOrbContainer/HPOrb
 @onready var hp_label: Label = $Control/HPOrbContainer/HPOrb/HPOrbLabel
@@ -34,7 +37,6 @@ func _ready() -> void:
 	_setup_slot1_fist_icon()
 	_setup_slot2_fireball_icon()
 	_setup_slot3_ice_arrow_icon()
-	_create_tooltip_in_code()
 	_create_locked_slot_overlays()
 	_create_skill_cooldown_overlays()
 	
@@ -106,49 +108,46 @@ func _fill_tooltip(card: PanelContainer, title_text: String, stats: Array) -> vo
 		lbl.add_theme_font_size_override("font_size", 12)
 		vbox.add_child(lbl)
 
-func _create_tooltip_in_code() -> void:
+func configure_skills(skills: Array[SkillDataType]) -> void:
+	if skill1_tooltip or skill2_tooltip or skill3_tooltip:
+		return
 	var root_control: Control = $Control
-	
-	# Шаг слота = 54px + 6px gap = 60px, панель шириню 516px, начинается от -258px
-	# Центр слота N: -258 + (N-1)*60 + 8 + 27 = -258 + (N-1)*60 + 35
-	# Слот 1: -223, Слот 2: -163, Слот 3: -103
-	# Тултип (170px ширина): центр - 85 до центр + 85
+	var offsets := {
+		1: Vector2(-308.0, -138.0),
+		2: Vector2(-248.0, -78.0),
+		3: Vector2(-188.0, -18.0),
+	}
+	var border_colors := {
+		1: Color(0.8, 0.65, 0.3, 1.0),
+		2: Color(1.0, 0.4, 0.1, 1.0),
+		3: Color(0.3, 0.8, 1.0, 1.0),
+	}
+	for skill in skills:
+		if not offsets.has(skill.hotbar_slot):
+			continue
+		var offset: Vector2 = offsets[skill.hotbar_slot]
+		var card := _make_tooltip_card(offset.x, offset.y)
+		card.name = "Skill%dTooltipCard" % skill.hotbar_slot
+		card.add_theme_stylebox_override("panel", _make_tooltip_style(border_colors[skill.hotbar_slot]))
+		root_control.add_child(card)
+		_fill_tooltip(card, skill.display_name, _build_skill_stats(skill))
+		match skill.hotbar_slot:
+			1: skill1_tooltip = card
+			2: skill2_tooltip = card
+			3: skill3_tooltip = card
+	print("Skill tooltips configured from SkillData")
 
-	# Слот 1: Удар кулаком  (центр -223 от центра)
-	skill1_tooltip = _make_tooltip_card(-308.0, -138.0)
-	skill1_tooltip.name = "Skill1TooltipCard"
-	skill1_tooltip.add_theme_stylebox_override("panel", _make_tooltip_style(Color(0.8, 0.65, 0.3, 1.0)))
-	root_control.add_child(skill1_tooltip)
-	_fill_tooltip(skill1_tooltip, "Удар кулаком", [
-		["⚔️  Урон: 25", Color(1.0, 0.4, 0.4)],
-		["⏳ Перезарядка: 0.6с", Color(1.0, 0.84, 0.3)],
-		["💧 Расход маны: 0", Color(0.4, 0.8, 1.0)],
-	])
-
-	# Слот 2: Огненный шар (центр -163)
-	skill2_tooltip = _make_tooltip_card(-248.0, -78.0)
-	skill2_tooltip.name = "Skill2TooltipCard"
-	skill2_tooltip.add_theme_stylebox_override("panel", _make_tooltip_style(Color(1.0, 0.4, 0.1, 1.0)))
-	root_control.add_child(skill2_tooltip)
-	_fill_tooltip(skill2_tooltip, "Огненный шар", [
-		["🔥 Урон: 80", Color(1.0, 0.4, 0.1)],
-		["⏳ Перезарядка: 3.0с", Color(1.0, 0.84, 0.3)],
-		["💧 Расход маны: 30", Color(0.4, 0.8, 1.0)],
-		["🎯 Дальность: 15м", Color(0.7, 1.0, 0.4)],
-	])
-
-	# Слот 3: Ледяная стрела (центр -103)
-	skill3_tooltip = _make_tooltip_card(-188.0, -18.0)
-	skill3_tooltip.name = "Skill3TooltipCard"
-	skill3_tooltip.add_theme_stylebox_override("panel", _make_tooltip_style(Color(0.3, 0.8, 1.0, 1.0)))
-	root_control.add_child(skill3_tooltip)
-	_fill_tooltip(skill3_tooltip, "Ледяная стрела", [
-		["❄️ Урон: 45", Color(0.5, 0.9, 1.0)],
-		["⏳ Перезарядка: 5.0с", Color(1.0, 0.84, 0.3)],
-		["💧 Расход маны: 20", Color(0.4, 0.8, 1.0)],
-		["🐜 Замедляет врага 2.5с", Color(0.7, 0.9, 1.0)],
-	])
-	print("✅ Карточки 3 скиллов созданы!")
+func _build_skill_stats(skill: SkillDataType) -> Array:
+	var result: Array = [
+		["Урон: %d" % skill.damage, Color(1.0, 0.4, 0.4)],
+		["Перезарядка: %.1fс" % skill.cooldown, Color(1.0, 0.84, 0.3)],
+		["Расход маны: %d" % skill.mana_cost, Color(0.4, 0.8, 1.0)],
+	]
+	if skill.max_range > 0.0:
+		result.append(["Дальность: %.0fм" % skill.max_range, Color(0.7, 1.0, 0.4)])
+	if skill.status_duration > 0.0:
+		result.append(["Эффект: %.1fс" % skill.status_duration, Color(0.7, 0.9, 1.0)])
+	return result
 
 func _create_locked_slot_overlays() -> void:
 	# Заглушки на заблокированных слотах 4–8
@@ -407,11 +406,6 @@ func _create_circle_texture(fill_color: Color, border_color: Color) -> ImageText
 				img.set_pixel(x, y, Color(0, 0, 0, 0))
 				
 	return ImageTexture.create_from_image(img)
-
-func setup_hud(current_hp: int, max_hp: int, current_energy: int, max_energy: int, level: int, current_xp: int, max_xp: int) -> void:
-	update_hp(current_hp, max_hp)
-	update_energy(current_energy, max_energy)
-	update_xp(level, current_xp, max_xp)
 
 func update_hp(current: int, maximum: int) -> void:
 	hp_orb.max_value = maximum

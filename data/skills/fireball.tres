@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/skill_data.gd" id="1_skill_data"]
+
+[resource]
+script = ExtResource("1_skill_data")
+skill_id = &"fireball"
+display_name = "Огненный шар"
+description = "Взрывается и поджигает противников в области попадания."
+hotbar_slot = 2
+damage = 80
+mana_cost = 30
+cooldown = 3.0
+max_range = 15.0
+cast_animation = &"mixamo/Fireball"
+release_ratio = 0.4
+cast_speed = 1.5
+projectile_height = 1.0
+effect_type = &"fire"
+projectile_speed = 18.0
+projectile_lifetime = 3.0
+projectile_color = Color(1, 0.45, 0, 1)
+explosion_radius = 4.5
+status_duration = 3.0
+status_potency = 1.0
+status_tick_damage = 10

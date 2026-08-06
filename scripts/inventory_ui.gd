@@ -1,5 +1,7 @@
 extends CanvasLayer
 
+const InventoryModelType = preload("res://scripts/data/inventory_model.gd")
+
 const GRID_COLS := 10
 const GRID_ROWS := 6
 const INVENTORY_CAPACITY := GRID_COLS * GRID_ROWS
@@ -16,9 +18,10 @@ var is_open := false
 var panel_w := 0.0
 var panel_h := 0.0
 var player_ref: Node = null
-var gold := 0
 var grid_slots: Array[InventorySlot] = []
 var equipment_slots: Dictionary = {}
+var equipment_key_by_slot: Dictionary = {}
+var inventory_model: InventoryModelType
 
 const EQUIPMENT_PATHS := {
 	"weapon_1": ["RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/LeftCol/SlotWeapon", "weapon", "ОРУЖИЕ 1"],
@@ -45,6 +48,12 @@ func _ready() -> void:
 
 	_setup_equipment_slots()
 	_setup_grid()
+	var categories := {}
+	for key in EQUIPMENT_PATHS:
+		categories[key] = str(EQUIPMENT_PATHS[key][1])
+	inventory_model = InventoryModelType.new(INVENTORY_CAPACITY, categories)
+	inventory_model.changed.connect(_sync_slots)
+	inventory_model.gold_changed.connect(_update_gold)
 	sort_button.flat = true
 	sort_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	sort_button.pressed.connect(sort_inventory)
@@ -100,6 +109,7 @@ func _setup_equipment_slots() -> void:
 		slot.configure(-1, str(config[1]), str(config[2]))
 		_connect_slot(slot)
 		equipment_slots[key] = slot
+		equipment_key_by_slot[slot] = key
 
 
 func _setup_grid() -> void:
@@ -141,14 +151,9 @@ func _make_grid_style() -> StyleBoxFlat:
 
 
 func _transfer_item(source: InventorySlot, target: InventorySlot) -> void:
-	if source == target or source.item.is_empty() or not target.can_accept(source.item):
+	if source == target:
 		return
-	if not target.item.is_empty() and not source.can_accept(target.item):
-		return
-	var source_item := source.take_item()
-	var target_item := target.take_item()
-	target.set_item(source_item)
-	source.set_item(target_item)
+	inventory_model.transfer(_slot_ref(source), _slot_ref(target))
 
 
 func _activate_item(slot: InventorySlot) -> void:
@@ -172,89 +177,38 @@ func _activate_item(slot: InventorySlot) -> void:
 func _use_consumable(slot: InventorySlot, effect: String) -> void:
 	if not player_ref:
 		return
+	var power := int(slot.item.get("power", 0))
 	if effect == "health":
-		var current_hp := int(player_ref.get("current_hp"))
-		var max_hp := int(player_ref.get("max_hp"))
-		player_ref.set("current_hp", min(max_hp, current_hp + int(slot.item.get("power", 35))))
+		if not player_ref.has_method("restore_health"):
+			return
+		player_ref.restore_health(power)
 	elif effect == "mana":
-		var current_energy := int(player_ref.get("current_energy"))
-		var max_energy := int(player_ref.get("max_energy"))
-		player_ref.set("current_energy", min(max_energy, current_energy + int(slot.item.get("power", 25))))
+		if not player_ref.has_method("restore_energy"):
+			return
+		player_ref.restore_energy(power)
 	else:
 		return
-	if player_ref.has_method("_update_hud"):
-		player_ref.call("_update_hud")
-	var updated := slot.item.duplicate(true)
-	updated["quantity"] = int(updated.get("quantity", 1)) - 1
-	slot.set_item(updated if updated["quantity"] > 0 else {})
+	inventory_model.consume(_slot_ref(slot))
 
 
 func add_item(new_item: Dictionary) -> bool:
-	if new_item.is_empty() or not new_item.has("id") or not new_item.has("name"):
-		return false
-	var remaining := int(new_item.get("quantity", 1))
-	var max_stack: int = max(1, int(new_item.get("max_stack", 1)))
-	if max_stack > 1:
-		for slot in grid_slots:
-			if slot.item.get("id") == new_item.get("id") and int(slot.item.get("quantity", 1)) < max_stack:
-				var stacked := slot.item.duplicate(true)
-				var space: int = max_stack - int(stacked.get("quantity", 1))
-				var moved: int = min(space, remaining)
-				stacked["quantity"] = int(stacked.get("quantity", 1)) + moved
-				slot.set_item(stacked)
-				remaining -= moved
-				if remaining <= 0:
-					return true
-	while remaining > 0:
-		var empty_slot := _first_empty_grid_slot()
-		if not empty_slot:
-			return false
-		var placed := new_item.duplicate(true)
-		placed["quantity"] = min(remaining, max_stack)
-		empty_slot.set_item(placed)
-		remaining -= int(placed["quantity"])
-	return true
+	return inventory_model.add_item(new_item)
 
 
 func sort_inventory() -> void:
-	var items: Array[Dictionary] = []
-	for slot in grid_slots:
-		if not slot.item.is_empty():
-			items.append(slot.item.duplicate(true))
-		slot.set_item({})
-	items.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
-		var a_key := "%s_%s" % [str(a.get("slot", "zz_consumable")), str(a.get("name", ""))]
-		var b_key := "%s_%s" % [str(b.get("slot", "zz_consumable")), str(b.get("name", ""))]
-		return a_key.naturalnocasecmp_to(b_key) < 0
-	)
-	for index in range(items.size()):
-		grid_slots[index].set_item(items[index])
+	inventory_model.sort_items()
 
 
 func set_gold(amount: int) -> void:
-	gold = max(0, amount)
-	_update_gold()
+	inventory_model.set_gold(amount)
 
 
 func get_inventory_state() -> Dictionary:
-	var stored_items: Array[Dictionary] = []
-	for slot in grid_slots:
-		stored_items.append(slot.item.duplicate(true))
-	var equipped := {}
-	for key in equipment_slots:
-		equipped[key] = equipment_slots[key].item.duplicate(true)
-	return {"gold": gold, "items": stored_items, "equipment": equipped}
+	return inventory_model.serialize()
 
 
 func load_inventory_state(state: Dictionary) -> void:
-	set_gold(int(state.get("gold", 0)))
-	var stored_items: Array = state.get("items", [])
-	for index in range(grid_slots.size()):
-		grid_slots[index].set_item(stored_items[index] if index < stored_items.size() else {})
-	var equipped: Dictionary = state.get("equipment", {})
-	for key in equipment_slots:
-		var value: Dictionary = equipped.get(key, {})
-		equipment_slots[key].set_item(value if equipment_slots[key].can_accept(value) else {})
+	inventory_model.load_state(state)
 
 
 func _first_empty_grid_slot() -> InventorySlot:
@@ -264,6 +218,19 @@ func _first_empty_grid_slot() -> InventorySlot:
 	return null
 
 
-func _update_gold() -> void:
+func _slot_ref(slot: InventorySlot) -> Dictionary:
+	if slot.slot_index >= 0:
+		return inventory_model.grid_ref(slot.slot_index)
+	return inventory_model.equipment_ref(str(equipment_key_by_slot.get(slot, "")))
+
+
+func _sync_slots() -> void:
+	for index in range(grid_slots.size()):
+		grid_slots[index].set_item(inventory_model.get_item(inventory_model.grid_ref(index)))
+	for key in equipment_slots:
+		equipment_slots[key].set_item(inventory_model.get_item(inventory_model.equipment_ref(key)))
+
+
+func _update_gold(_value: int = 0) -> void:
 	if gold_label:
-		gold_label.text = str(gold)
+		gold_label.text = str(inventory_model.gold if inventory_model else 0)

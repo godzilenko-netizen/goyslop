@@ -1,6 +1,14 @@
 extends CharacterBody3D
 
-@export var max_hp: int = 300
+const ModelValidatorType = preload("res://scripts/model_validator.gd")
+const HealthComponentType = preload("res://scripts/components/health_component.gd")
+const TROLL_MODEL_SCENE = preload("res://models/troll/Troll.fbx")
+const TROLL_MOVE_SCENE = preload("res://models/troll/Capoeira.fbx")
+const TROLL_ATTACK_SCENE = preload("res://models/troll/Baseball Hit.fbx")
+const TROLL_DEATH_SCENE = preload("res://models/troll/Dying.fbx")
+
+enum State { CIRCLING, AGGRO, ATTACKING, WAITING, DYING }
+
 @export var walk_speed: float = 3.0
 @export var run_speed: float = 6.0
 @export var circle_radius: float = 10.0
@@ -8,10 +16,10 @@ extends CharacterBody3D
 @export var attack_range: float = 2.5
 @export var attack_damage: int = 40
 
-var current_hp: int
-var state: String = "CIRCLING" # CIRCLING, AGGRO, ATTACKING, DYING
+var state: State = State.CIRCLING
 var anim_player: AnimationPlayer = null
 var player: Node3D = null
+static var _cached_animation_library: AnimationLibrary = null
 
 # Visuals and HP Bar
 var model_root: Node3D = null
@@ -30,11 +38,13 @@ var _burn_generation := 0
 
 var freeze_mat: StandardMaterial3D
 var burn_mat: StandardMaterial3D
+@onready var health: HealthComponentType = $Health
 
 func _ready() -> void:
-	current_hp = max_hp
 	add_to_group("Enemies")
 	player = get_tree().get_first_node_in_group("Player")
+	health.changed.connect(_on_health_changed)
+	health.died.connect(_die)
 	
 	freeze_mat = StandardMaterial3D.new()
 	freeze_mat.albedo_color = Color(0.2, 0.5, 1.0, 0.6)
@@ -52,23 +62,22 @@ func _ready() -> void:
 	_setup_animations()
 
 func _setup_visuals() -> void:
-	var troll_scene = load("res://models/troll/Troll.fbx") as PackedScene
-	if troll_scene:
-		model_root = troll_scene.instantiate()
+	if TROLL_MODEL_SCENE:
+		model_root = TROLL_MODEL_SCENE.instantiate()
 		add_child(model_root)
-		ModelValidator.auto_fit_model_size(model_root, 2.5) # Trolls are big!
+		ModelValidatorType.auto_fit_model_size(model_root, 2.5)
 
 func _setup_hp_bar() -> void:
 	# Create a SubViewport for the HP Bar UI
 	hp_viewport = SubViewport.new()
 	hp_viewport.transparent_bg = true
 	hp_viewport.size = Vector2i(200, 30)
-	hp_viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	hp_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
 	
 	hp_bar = ProgressBar.new()
 	hp_bar.min_value = 0
-	hp_bar.max_value = max_hp
-	hp_bar.value = current_hp
+	hp_bar.max_value = health.max_health
+	hp_bar.value = health.current_health
 	hp_bar.show_percentage = false
 	hp_bar.custom_minimum_size = Vector2(200, 30)
 	
@@ -108,40 +117,35 @@ func _setup_animations() -> void:
 		anim_player = AnimationPlayer.new()
 		model_root.add_child(anim_player)
 		
-	var anim_library = AnimationLibrary.new()
-	
-	var anim_files = {
-		"Move": "res://models/troll/Capoeira.fbx",
-		"Attack": "res://models/troll/Baseball Hit.fbx",
-		"Death": "res://models/troll/Dying.fbx"
-	}
-	
-	for anim_name in anim_files:
-		var path = anim_files[anim_name]
-		if ResourceLoader.exists(path):
-			var fbx_scene = load(path) as PackedScene
-			if fbx_scene:
-				var inst = fbx_scene.instantiate()
-				var f_player = _find_anim_player(inst)
-				if f_player:
-					var list = f_player.get_animation_list()
-					if list.size() > 0:
-						var orig_anim = f_player.get_animation(list[0]).duplicate()
-						ModelValidator.sanitize_animation(orig_anim)
-						
-						if anim_name == "Move":
-							orig_anim.loop_mode = Animation.LOOP_LINEAR
-						else:
-							orig_anim.loop_mode = Animation.LOOP_NONE
-							
-						anim_library.add_animation(anim_name, orig_anim)
-				inst.queue_free()
-	
 	if anim_player.has_animation_library("troll"):
 		anim_player.remove_animation_library("troll")
-	anim_player.add_animation_library("troll", anim_library)
+	anim_player.add_animation_library("troll", _get_animation_library())
 	
 	_play_anim("Move")
+
+func _get_animation_library() -> AnimationLibrary:
+	if _cached_animation_library:
+		return _cached_animation_library
+	var library := AnimationLibrary.new()
+	var animation_scenes := {
+		"Move": TROLL_MOVE_SCENE,
+		"Attack": TROLL_ATTACK_SCENE,
+		"Death": TROLL_DEATH_SCENE,
+	}
+	for animation_name in animation_scenes:
+		var packed_scene: PackedScene = animation_scenes[animation_name]
+		var instance := packed_scene.instantiate()
+		var source_player := _find_anim_player(instance)
+		if source_player:
+			var animation_names := source_player.get_animation_list()
+			if not animation_names.is_empty():
+				var animation := source_player.get_animation(animation_names[0]).duplicate()
+				ModelValidatorType.sanitize_animation(animation)
+				animation.loop_mode = Animation.LOOP_LINEAR if animation_name == "Move" else Animation.LOOP_NONE
+				library.add_animation(animation_name, animation)
+		instance.free()
+	_cached_animation_library = library
+	return _cached_animation_library
 
 func _play_anim(anim_name: String, blend: float = 0.2, speed: float = 1.0) -> void:
 	if anim_player and anim_player.has_animation("troll/" + anim_name):
@@ -151,7 +155,7 @@ func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity.y -= 9.8 * delta
 		
-	if state == "DYING":
+	if state == State.DYING:
 		velocity.x = 0
 		velocity.z = 0
 		move_and_slide()
@@ -167,11 +171,11 @@ func _physics_process(delta: float) -> void:
 	dir_to_player = dir_to_player.normalized()
 	
 	match state:
-		"CIRCLING":
+		State.CIRCLING:
 			_process_circling(delta, dist_to_player, dir_to_player)
-		"AGGRO":
+		State.AGGRO:
 			_process_aggro(delta, dist_to_player, dir_to_player)
-		"ATTACKING":
+		State.ATTACKING:
 			velocity.x = 0
 			velocity.z = 0
 			if anim_player and anim_player.current_animation == "troll/Attack":
@@ -189,15 +193,15 @@ func _physics_process(delta: float) -> void:
 			
 			if anim_player and not anim_player.is_playing():
 				if _did_hit_player:
-					state = "WAITING"
+					state = State.WAITING
 					await get_tree().create_timer(0.5).timeout
-					if state == "WAITING":
-						state = "AGGRO"
+					if state == State.WAITING:
+						state = State.AGGRO
 						_play_anim("Move")
 				else:
-					state = "AGGRO"
+					state = State.AGGRO
 					_play_anim("Move")
-		"WAITING":
+		State.WAITING:
 			velocity.x = 0
 			velocity.z = 0
 
@@ -205,7 +209,7 @@ func _physics_process(delta: float) -> void:
 
 func _process_circling(delta: float, dist_to_player: float, dir_to_player: Vector3) -> void:
 	if dist_to_player <= aggro_range:
-		state = "AGGRO"
+		state = State.AGGRO
 		_play_anim("Move")
 		return
 	var target_dist = circle_radius
@@ -222,7 +226,7 @@ func _process_circling(delta: float, dist_to_player: float, dir_to_player: Vecto
 
 func _process_aggro(delta: float, dist_to_player: float, dir_to_player: Vector3) -> void:
 	if dist_to_player <= attack_range:
-		state = "ATTACKING"
+		state = State.ATTACKING
 		_has_hit = false
 		_did_hit_player = false
 		_play_anim("Attack", 0.2, 1.3) # Increased attack speed
@@ -241,20 +245,23 @@ func _smooth_look_at(target_pos: Vector3, delta: float) -> void:
 	global_transform = global_transform.orthonormalized()
 
 func take_damage(amount: int) -> void:
-	if state == "DYING": return
-	
-	current_hp = max(0, current_hp - amount)
-	hp_bar.value = current_hp
-	
-	if current_hp <= 0:
-		_die()
-	else:
-		if state == "CIRCLING":
-			state = "AGGRO"
-			_play_anim("Move")
+	if state == State.DYING: return
+	health.take_damage(amount)
+	if state == State.CIRCLING:
+		state = State.AGGRO
+		_play_anim("Move")
+
+func _on_health_changed(current: int, maximum: int) -> void:
+	if hp_bar:
+		hp_bar.max_value = maximum
+		hp_bar.value = current
+	if hp_viewport:
+		hp_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
 
 func _die() -> void:
-	state = "DYING"
+	if state == State.DYING:
+		return
+	state = State.DYING
 	_freeze_generation += 1
 	_burn_generation += 1
 	is_frozen = false
@@ -267,9 +274,8 @@ func _die() -> void:
 
 func _respawn() -> void:
 	if not is_instance_valid(self): return
-	current_hp = max_hp
-	hp_bar.value = current_hp
-	state = "CIRCLING"
+	health.reset()
+	state = State.CIRCLING
 	_set_collision_enabled(true)
 	_play_anim("Move")
 
@@ -289,14 +295,14 @@ func _set_overlay_recursive(node: Node, mat: Material) -> void:
 		_set_overlay_recursive(child, mat)
 
 func apply_freeze(duration: float, potency: float) -> void:
-	if is_frozen or state == "DYING": return
+	if is_frozen or state == State.DYING: return
 	_freeze_generation += 1
 	var generation := _freeze_generation
 	is_frozen = true
 	speed_modifier = potency
 	_apply_material_overlay(freeze_mat)
 	get_tree().create_timer(duration).timeout.connect(func():
-		if generation != _freeze_generation or state == "DYING":
+		if generation != _freeze_generation or state == State.DYING:
 			return
 		is_frozen = false
 		speed_modifier = 1.0
@@ -304,7 +310,7 @@ func apply_freeze(duration: float, potency: float) -> void:
 	)
 
 func apply_burn(duration: float = 3.0, damage_per_tick: int = 10) -> void:
-	if is_burning or state == "DYING": return
+	if is_burning or state == State.DYING: return
 	_burn_generation += 1
 	var generation := _burn_generation
 	is_burning = true
@@ -313,7 +319,7 @@ func apply_burn(duration: float = 3.0, damage_per_tick: int = 10) -> void:
 	var ticks = int(duration / 0.5)
 	for i in range(ticks):
 		await get_tree().create_timer(0.5).timeout
-		if generation != _burn_generation or state == "DYING":
+		if generation != _burn_generation or state == State.DYING:
 			return
 		if is_instance_valid(self):
 			take_damage(damage_per_tick)
