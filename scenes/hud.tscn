@@ -4,45 +4,53 @@
 [ext_resource type="Theme" path="res://themes/diablo2_theme.tres" id="2_theme"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xp_panel"]
-bg_color = Color(0.08, 0.09, 0.13, 0.92)
+bg_color = Color(0.048, 0.040, 0.030, 0.98)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.5, 0.4, 0.2, 1.0)
+border_color = Color(0.60, 0.44, 0.12, 1.0)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
+shadow_color = Color(0.0, 0.0, 0.0, 0.8)
+shadow_size = 6
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xp_bg"]
-bg_color = Color(0.12, 0.08, 0.18, 0.9)
+bg_color = Color(0.03, 0.02, 0.01, 0.95)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xp_fill"]
-bg_color = Color(0.72, 0.32, 0.98, 1.0)
+bg_color = Color(0.85, 0.65, 0.18, 1.0)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel_bg"]
-bg_color = Color(0.08, 0.09, 0.12, 0.9)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.45, 0.38, 0.22, 1.0)
+bg_color = Color(0.045, 0.036, 0.026, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.55, 0.40, 0.10, 1.0)
 corner_radius_top_left = 6
 corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
+shadow_color = Color(0.0, 0.0, 0.0, 0.9)
+shadow_size = 12
+shadow_offset = Vector2(0, 4)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_slot_bg"]
-bg_color = Color(0.12, 0.14, 0.18, 0.9)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.35, 0.3, 0.2, 1.0)
+bg_color = Color(0.025, 0.020, 0.014, 0.98)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.48, 0.35, 0.10, 1.0)
 corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+shadow_color = Color(0.0, 0.0, 0.0, 0.85)
+shadow_size = 4
 corner_radius_bottom_left = 4
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_minimap_bg"]
