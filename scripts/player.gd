@@ -62,7 +62,9 @@ var is_moving_backwards_state: bool = false
 func _ready() -> void:
 	randomize()
 	add_to_group("Player")
-	print("рџ”Ґ Р РµС‚СЂРѕ 3D Р­РєС€РЅ. Р˜РјСЏ СЃРѕС…СЂР°РЅРµРЅРёСЏ: ", Global.current_save_name)
+	var global_state := get_node_or_null("/root/Global")
+	var save_name: String = str(global_state.current_save_name) if global_state else "default"
+	print("Game save: ", save_name)
 	if spring_arm:
 		spring_arm.add_excluded_object(get_rid())
 		
@@ -161,6 +163,12 @@ func _physics_process(delta: float) -> void:
 		if not is_on_floor(): velocity.y -= gravity * delta
 		move_and_slide()
 		return
+	if inventory_ui and inventory_ui.get("is_open") == true:
+		velocity.x = move_toward(velocity.x, 0, friction * delta)
+		velocity.z = move_toward(velocity.z, 0, friction * delta)
+		if not is_on_floor(): velocity.y -= gravity * delta
+		move_and_slide()
+		return
 
 	_regen_timer += delta
 	if _regen_timer >= 1.0:
@@ -206,7 +214,7 @@ func _physics_process(delta: float) -> void:
 	# РЎРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ РєР°РјРµСЂС‹ РјРёРЅРёРєР°СЂС‚С‹ Р·Р° РёРіСЂРѕРєРѕРј
 	_update_minimap_camera()
 
-# Shift camera so player appears left-center when inventory is open.
+# Shift camera so the player remains centered in the unobstructed play area.
 # We tween camera.h_offset (camera-local horizontal shift) which works
 # correctly for top-down isometric cameras in Godot 4.
 func shift_camera_for_ui(ui_open: bool) -> void:
@@ -214,8 +222,7 @@ func shift_camera_for_ui(ui_open: bool) -> void:
 	var tw := create_tween()
 	# Use PROCESS mode so this works even if tree is paused in future
 	tw.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
-	# -7.0 units shifts character to left ~40% of a 1920-wide screen
-	# at typical spring_arm length / FOV. Tune here if needed.
+	# A positive camera-local offset moves the rendered player to the left.
 	var target: float = 4.0 if ui_open else 0.0
 	tw.tween_property(camera, "h_offset", target, 0.35) \
 	  .set_trans(Tween.TRANS_CUBIC) \
@@ -274,6 +281,8 @@ func _update_animations(direction: Vector3, is_sprinting: bool) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if is_dead or is_knocked_down: return
+	if inventory_ui and inventory_ui.get("is_open") == true:
+		return
 	if event.is_action_pressed("attack"):
 		attack()
 	elif event.is_action_pressed("skill_2"):
@@ -429,16 +438,23 @@ func _knockdown() -> void:
 	if anim_player and anim_player.has_animation("mixamo/FallingBack"):
 		anim_player.speed_scale = 1.5
 		anim_player.play("mixamo/FallingBack", 0.1)
-		var anim_len = anim_player.get_animation("mixamo/FallingBack").length
+
+	# The launch begins while the body still reports its previous floor state.
+	# Wait one physics frame, then keep controls locked until the body lands.
+	await get_tree().physics_frame
+	var airborne_time := 0.0
+	while not is_on_floor() and airborne_time < 5.0:
+		await get_tree().physics_frame
+		airborne_time += get_physics_process_delta_time()
+
+	if is_dead:
+		return
+
+	if anim_player and anim_player.has_animation("mixamo/GettingUp"):
+		anim_player.speed_scale = 1.5
+		anim_player.play("mixamo/GettingUp", 0.1)
+		var anim_len := anim_player.get_animation("mixamo/GettingUp").length
 		await get_tree().create_timer(anim_len / 1.5).timeout
-		
-		if is_dead: return
-		
-		if anim_player.has_animation("mixamo/GettingUp"):
-			anim_player.speed_scale = 1.5
-			anim_player.play("mixamo/GettingUp", 0.1)
-			anim_len = anim_player.get_animation("mixamo/GettingUp").length
-			await get_tree().create_timer(anim_len / 1.5).timeout
 			
 	if not is_dead:
 		is_knocked_down = false

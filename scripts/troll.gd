@@ -4,6 +4,7 @@ extends CharacterBody3D
 @export var walk_speed: float = 3.0
 @export var run_speed: float = 6.0
 @export var circle_radius: float = 10.0
+@export var aggro_range: float = 7.0
 @export var attack_range: float = 2.5
 @export var attack_damage: int = 40
 
@@ -24,6 +25,8 @@ var is_burning: bool = false
 var speed_modifier: float = 1.0
 var _has_hit: bool = false
 var _did_hit_player: bool = false
+var _freeze_generation := 0
+var _burn_generation := 0
 
 var freeze_mat: StandardMaterial3D
 var burn_mat: StandardMaterial3D
@@ -54,16 +57,6 @@ func _setup_visuals() -> void:
 		model_root = troll_scene.instantiate()
 		add_child(model_root)
 		ModelValidator.auto_fit_model_size(model_root, 2.5) # Trolls are big!
-		
-	# Create physics collision shape dynamically
-	var col_shape = CollisionShape3D.new()
-	col_shape.name = "CollisionShape3D"
-	var cap = CapsuleShape3D.new()
-	cap.radius = 0.8
-	cap.height = 2.5
-	col_shape.shape = cap
-	col_shape.position = Vector3(0, 1.25, 0)
-	add_child(col_shape)
 
 func _setup_hp_bar() -> void:
 	# Create a SubViewport for the HP Bar UI
@@ -211,6 +204,10 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 func _process_circling(delta: float, dist_to_player: float, dir_to_player: Vector3) -> void:
+	if dist_to_player <= aggro_range:
+		state = "AGGRO"
+		_play_anim("Move")
+		return
 	var target_dist = circle_radius
 	
 	var tangent = Vector3(-dir_to_player.z, 0, dir_to_player.x) # Rotate 90 degrees
@@ -258,25 +255,28 @@ func take_damage(amount: int) -> void:
 
 func _die() -> void:
 	state = "DYING"
+	_freeze_generation += 1
+	_burn_generation += 1
+	is_frozen = false
+	is_burning = false
+	speed_modifier = 1.0
+	_apply_material_overlay(null)
 	_play_anim("Death")
-	# Disable collisions
-	if has_node("CollisionShape3D"):
-		$CollisionShape3D.set_deferred("disabled", true)
-	
-	var anim_len = 2.0
-	if anim_player and anim_player.has_animation("troll/Death"):
-		anim_len = anim_player.get_animation("troll/Death").length
-		
-	get_tree().create_timer(anim_len + 10.0).timeout.connect(_respawn)
+	_set_collision_enabled(false)
+	get_tree().create_timer(10.0).timeout.connect(_respawn)
 
 func _respawn() -> void:
 	if not is_instance_valid(self): return
 	current_hp = max_hp
 	hp_bar.value = current_hp
 	state = "CIRCLING"
-	if has_node("CollisionShape3D"):
-		$CollisionShape3D.set_deferred("disabled", false)
+	_set_collision_enabled(true)
 	_play_anim("Move")
+
+func _set_collision_enabled(enabled: bool) -> void:
+	for child in get_children():
+		if child is CollisionShape3D:
+			child.set_deferred("disabled", not enabled)
 
 func _apply_material_overlay(mat: Material) -> void:
 	if not model_root: return
@@ -290,28 +290,35 @@ func _set_overlay_recursive(node: Node, mat: Material) -> void:
 
 func apply_freeze(duration: float, potency: float) -> void:
 	if is_frozen or state == "DYING": return
+	_freeze_generation += 1
+	var generation := _freeze_generation
 	is_frozen = true
 	speed_modifier = potency
 	_apply_material_overlay(freeze_mat)
 	get_tree().create_timer(duration).timeout.connect(func():
+		if generation != _freeze_generation or state == "DYING":
+			return
 		is_frozen = false
-		if not is_burning:
-			_apply_material_overlay(null)
-			speed_modifier = 1.0
+		speed_modifier = 1.0
+		_apply_material_overlay(burn_mat if is_burning else null)
 	)
 
 func apply_burn(duration: float = 3.0, damage_per_tick: int = 10) -> void:
 	if is_burning or state == "DYING": return
+	_burn_generation += 1
+	var generation := _burn_generation
 	is_burning = true
 	_apply_material_overlay(burn_mat)
 	
 	var ticks = int(duration / 0.5)
 	for i in range(ticks):
 		await get_tree().create_timer(0.5).timeout
-		if is_instance_valid(self) and state != "DYING":
+		if generation != _burn_generation or state == "DYING":
+			return
+		if is_instance_valid(self):
 			take_damage(damage_per_tick)
 			
-	if is_instance_valid(self):
+	if is_instance_valid(self) and generation == _burn_generation:
 		is_burning = false
 		if is_frozen:
 			_apply_material_overlay(freeze_mat)

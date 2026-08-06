@@ -109,12 +109,6 @@ func _fill_tooltip(card: PanelContainer, title_text: String, stats: Array) -> vo
 func _create_tooltip_in_code() -> void:
 	var root_control: Control = $Control
 	
-	# Удаляем старые из tscn если есть
-	for old_name in ["Skill1TooltipCard", "Skill2TooltipCard", "Skill3TooltipCard"]:
-		var old = root_control.get_node_or_null(old_name)
-		if old:
-			old.queue_free()
-
 	# Шаг слота = 54px + 6px gap = 60px, панель шириню 516px, начинается от -258px
 	# Центр слота N: -258 + (N-1)*60 + 8 + 27 = -258 + (N-1)*60 + 35
 	# Слот 1: -223, Слот 2: -163, Слот 3: -103

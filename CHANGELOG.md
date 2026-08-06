@@ -1,6 +1,19 @@
 # Changelog
 
 ## [Unreleased]
+### Fixed
+- Inventory is now functional: 60 storage slots support stacking, drag-and-drop, sorting, equipment validation, consumable use, starter items, gold, and state serialization.
+- Player movement and combat input are locked while the inventory is open.
+- Troll now has exactly one collision shape, properly disables it while dead, and respawns exactly 10 seconds after death.
+- Troll enters Aggro when the player comes within `aggro_range`, as described.
+- Knockback keeps player controls locked until the character actually lands before playing Getting Up.
+- Overlapping freeze and burn effects no longer leave the Troll permanently slowed.
+- Removed duplicate HUD tooltip construction and corrected scene `load_steps` metadata so UI nodes are no longer skipped during instantiation.
+- Windows Compatibility rendering is pinned to OpenGL 3 to avoid Vulkan surface errors.
+- Replaced smoke-only scripts with asserting scene, HUD, physics, inventory, Troll-state, and knockdown tests.
+- Removed temporary repository patch scripts.
+- Removed the unused duplicate `Trollo.obj`, which referenced a missing material library and broke clean imports.
+
 ### Added
 - **Troll Mob**: Added a new enemy "Troll" with customized logic and behaviors.
   - Implemented 3 states: Circling, Aggro (chasing), and Attacking.

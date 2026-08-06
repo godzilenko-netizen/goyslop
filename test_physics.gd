@@ -1,17 +1,38 @@
 extends SceneTree
 
-func _init():
-    var proj_scene = load("res://scenes/projectile.tscn")
-    var dummy_scene = load("res://scenes/dummy.tscn")
-    var p = proj_scene.instantiate()
-    var d = dummy_scene.instantiate()
-    var root = Node3D.new()
-    root.add_child(p)
-    root.add_child(d)
-    
-    p.global_position = Vector3(0, 0, 0)
-    d.global_position = Vector3(0, 0, 0)
-    
-    print("Proj mask: ", p.collision_mask)
-    print("Dummy layer: ", d.collision_layer)
-    quit()
+
+func _init() -> void:
+	call_deferred("_run")
+
+
+func _run() -> void:
+	var projectile_scene := load("res://scenes/projectile.tscn") as PackedScene
+	var dummy_scene := load("res://scenes/dummy.tscn") as PackedScene
+	if not projectile_scene or not dummy_scene:
+		push_error("TEST: projectile or dummy scene failed to load")
+		quit(1)
+		return
+
+	var test_root := Node3D.new()
+	root.add_child(test_root)
+	var projectile := projectile_scene.instantiate() as Area3D
+	var dummy := dummy_scene.instantiate() as PhysicsBody3D
+	test_root.add_child(projectile)
+	test_root.add_child(dummy)
+	projectile.global_position = Vector3.ZERO
+	dummy.global_position = Vector3.ZERO
+	await physics_frame
+	await physics_frame
+
+	var masks_overlap := (projectile.collision_mask & dummy.collision_layer) != 0
+	if not masks_overlap:
+		push_error("TEST: projectile mask does not include enemy collision layer")
+		test_root.queue_free()
+		await process_frame
+		quit(1)
+		return
+
+	print("TEST PASSED: projectile mask overlaps enemy layer")
+	test_root.queue_free()
+	await process_frame
+	quit(0)

@@ -1,6 +1,7 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://scripts/inventory_ui.gd" id="1_script"]
+[ext_resource type="Script" path="res://scripts/inventory_slot.gd" id="2_slot"]
 
 [sub_resource type="StyleBoxFlat" id="SB_outer"]
 bg_color = Color(0.10, 0.085, 0.062, 0.99)
@@ -215,6 +216,7 @@ theme_override_constants/separation = 8
 custom_minimum_size = Vector2(120, 260)
 layout_mode = 2
 theme_override_styles/panel = SubResource("SB_slot_large")
+script = ExtResource("2_slot")
 
 [node name="L" type="Label" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/LeftCol/SlotWeapon"]
 layout_mode = 2
@@ -246,6 +248,7 @@ layout_mode = 2
 custom_minimum_size = Vector2(88, 88)
 layout_mode = 2
 theme_override_styles/panel = SubResource("SB_slot_normal")
+script = ExtResource("2_slot")
 
 [node name="L" type="Label" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/CenterCol/HatRow/SlotHelmet"]
 layout_mode = 2
@@ -260,6 +263,7 @@ custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 size_flags_vertical = 4
 theme_override_styles/panel = SubResource("SB_slot_accent")
+script = ExtResource("2_slot")
 
 [node name="L" type="Label" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/CenterCol/HatRow/SlotAmulet"]
 layout_mode = 2
@@ -287,6 +291,7 @@ custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 size_flags_vertical = 4
 theme_override_styles/panel = SubResource("SB_slot_accent")
+script = ExtResource("2_slot")
 
 [node name="L" type="Label" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/CenterCol/ArmorRow/SlotRing1"]
 layout_mode = 2
@@ -300,6 +305,7 @@ vertical_alignment = 1
 custom_minimum_size = Vector2(116, 116)
 layout_mode = 2
 theme_override_styles/panel = SubResource("SB_slot_large")
+script = ExtResource("2_slot")
 
 [node name="L" type="Label" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/CenterCol/ArmorRow/SlotArmor"]
 layout_mode = 2
@@ -314,6 +320,7 @@ custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 size_flags_vertical = 4
 theme_override_styles/panel = SubResource("SB_slot_accent")
+script = ExtResource("2_slot")
 
 [node name="L" type="Label" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/CenterCol/ArmorRow/SlotRing2"]
 layout_mode = 2
@@ -341,6 +348,7 @@ custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 size_flags_vertical = 4
 theme_override_styles/panel = SubResource("SB_slot_accent")
+script = ExtResource("2_slot")
 
 [node name="L" type="Label" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/CenterCol/BeltRow/SlotAcc1"]
 layout_mode = 2
@@ -354,6 +362,7 @@ vertical_alignment = 1
 custom_minimum_size = Vector2(116, 64)
 layout_mode = 2
 theme_override_styles/panel = SubResource("SB_slot_normal")
+script = ExtResource("2_slot")
 
 [node name="L" type="Label" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/CenterCol/BeltRow/SlotBelt"]
 layout_mode = 2
@@ -368,6 +377,7 @@ custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 size_flags_vertical = 4
 theme_override_styles/panel = SubResource("SB_slot_accent")
+script = ExtResource("2_slot")
 
 [node name="L" type="Label" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/CenterCol/BeltRow/SlotAcc2"]
 layout_mode = 2
@@ -389,6 +399,7 @@ theme_override_constants/separation = 8
 custom_minimum_size = Vector2(120, 260)
 layout_mode = 2
 theme_override_styles/panel = SubResource("SB_slot_large")
+script = ExtResource("2_slot")
 
 [node name="L" type="Label" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/RightCol/SlotShield"]
 layout_mode = 2
@@ -493,7 +504,7 @@ text = "0"
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="SortLbl" type="Label" parent="RootPanel/InnerBorder/OM/VBox/Footer/FM/FHBox"]
+[node name="SortLbl" type="Button" parent="RootPanel/InnerBorder/OM/VBox/Footer/FM/FHBox"]
 layout_mode = 2
 size_flags_vertical = 4
 theme_override_colors/font_color = Color(0.35, 0.26, 0.10, 0.9)
