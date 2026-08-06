@@ -34,9 +34,6 @@ var slot3_cd_overlay: ColorRect = null
 func _ready() -> void:
 	_force_runtime_ui_layout()
 	_setup_procedural_orbs()
-	_setup_slot1_fist_icon()
-	_setup_slot2_fireball_icon()
-	_setup_slot3_ice_arrow_icon()
 	_create_locked_slot_overlays()
 	_create_skill_cooldown_overlays()
 	
@@ -109,8 +106,6 @@ func _fill_tooltip(card: PanelContainer, title_text: String, stats: Array) -> vo
 		vbox.add_child(lbl)
 
 func configure_skills(skills: Array[SkillDataType]) -> void:
-	if skill1_tooltip or skill2_tooltip or skill3_tooltip:
-		return
 	var root_control: Control = $Control
 	var offsets := {
 		1: Vector2(-308.0, -138.0),
@@ -123,6 +118,16 @@ func configure_skills(skills: Array[SkillDataType]) -> void:
 		3: Color(0.3, 0.8, 1.0, 1.0),
 	}
 	for skill in skills:
+		# Update texture on skill slot icon
+		var slot_path := "Control/BottomCenterPanel/HotbarContainer/Slot%d" % skill.hotbar_slot
+		if root_control.has_node(slot_path):
+			var slot_node := root_control.get_node(slot_path)
+			var icon_rect: TextureRect = slot_node.get_node_or_null("SkillIcon")
+			if not icon_rect:
+				icon_rect = slot_node.get_node_or_null("FistIcon")
+			if icon_rect and skill.icon:
+				icon_rect.texture = skill.icon
+
 		if not offsets.has(skill.hotbar_slot):
 			continue
 		var offset: Vector2 = offsets[skill.hotbar_slot]
@@ -135,7 +140,7 @@ func configure_skills(skills: Array[SkillDataType]) -> void:
 			1: skill1_tooltip = card
 			2: skill2_tooltip = card
 			3: skill3_tooltip = card
-	print("Skill tooltips configured from SkillData")
+	print("Skill tooltips and icons configured from SkillData")
 
 func _build_skill_stats(skill: SkillDataType) -> Array:
 	var result: Array = [
@@ -179,59 +184,7 @@ func _create_locked_slot_overlays() -> void:
 		lock_lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		slot.add_child(lock_lbl)
 
-func _setup_slot2_fireball_icon() -> void:
-	if slot2_icon:
-		slot2_icon.texture = _create_fireball_texture()
 
-func _setup_slot3_ice_arrow_icon() -> void:
-	var slot3 = $Control/BottomCenterPanel/HotbarContainer/Slot3
-	if not slot3:
-		return
-	var icon = TextureRect.new()
-	icon.expand_mode = 1
-	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	icon.texture = _create_ice_arrow_texture()
-	icon.anchor_left = 0.0; icon.anchor_top = 0.0
-	icon.anchor_right = 1.0; icon.anchor_bottom = 1.0
-	icon.offset_left = 4; icon.offset_top = 4
-	icon.offset_right = -4; icon.offset_bottom = -4
-	slot3.add_child(icon)
-
-func _create_ice_arrow_texture() -> ImageTexture:
-	var size = 32
-	var img = Image.create(size, size, false, Image.FORMAT_RGBA8)
-	img.fill(Color(0, 0, 0, 0))
-	# Стела стрелы (diagonally)
-	var c_ice = Color(0.55, 0.92, 1.0, 1.0)
-	var c_glow = Color(0.3, 0.75, 1.0, 0.7)
-	var c_tip = Color(1.0, 1.0, 1.0, 1.0)
-	# Диагональное тело
-	for i in range(22):
-		var px = 4 + i
-		var py = 27 - i
-		if px < size and py >= 0:
-			img.set_pixel(px, py, c_ice)
-			if px + 1 < size and py - 1 >= 0:
-				img.set_pixel(px + 1, py, c_glow)
-				img.set_pixel(px, py - 1, c_glow)
-	# Наконечник
-	for dx in [-1, 0, 1]:
-		for dy in [-1, 0, 1]:
-			var px = 5 + dx
-			var py = 26 + dy
-			if px >= 0 and px < size and py >= 0 and py < size:
-				img.set_pixel(px, py, c_tip)
-	# Хвост (3 перья)
-	var feathers = [[23, 7], [24, 8], [22, 6], [21, 9], [25, 9]]
-	for f in feathers:
-		if f[0] < size and f[1] < size:
-			img.set_pixel(f[0], f[1], c_ice)
-	# Иней
-	var frost = [[12, 16], [13, 15], [14, 14], [11, 17], [15, 13]]
-	for fr in frost:
-		if fr[0] < size and fr[1] < size:
-			img.set_pixel(fr[0], fr[1], Color(0.8, 0.95, 1.0, 0.85))
-	return ImageTexture.create_from_image(img)
 
 func _create_skill_cooldown_overlays() -> void:
 	# Процедурно создаём оверлеи кулдауна для слотов 2 и 3
@@ -267,24 +220,7 @@ func _create_skill_cooldown_overlays() -> void:
 		slot3_cd_overlay.visible = false
 		slot3.add_child(slot3_cd_overlay)
 
-func _create_fireball_texture() -> ImageTexture:
-	var size = 32
-	var img = Image.create(size, size, false, Image.FORMAT_RGBA8)
-	img.fill(Color(0, 0, 0, 0))
-	var center = Vector2(16, 16)
-	for x in range(size):
-		for y in range(size):
-			var d = Vector2(x, y).distance_to(center)
-			if d < 10:
-				var t = 1.0 - d / 10.0
-				var col = Color(1.0, 0.2 + t * 0.5, 0.0, t)
-				img.set_pixel(x, y, col)
-	# Искры
-	var sparks = [[8,5],[7,6],[6,8],[5,10],[23,7],[24,9],[25,11],[16,4],[16,3]]
-	for s in sparks:
-		if s[0] < size and s[1] < size:
-			img.set_pixel(s[0], s[1], Color(1.0, 0.9, 0.2, 0.9))
-	return ImageTexture.create_from_image(img)
+
 
 func _force_runtime_ui_layout() -> void:
 	if energy_label:
@@ -336,57 +272,7 @@ func _setup_procedural_orbs() -> void:
 	energy_orb.texture_under = energy_bg_tex
 	energy_orb.texture_progress = energy_fill_tex
 
-func _setup_slot1_fist_icon() -> void:
-	if slot1_icon:
-		slot1_icon.texture = _create_fist_texture()
 
-func _create_fist_texture() -> ImageTexture:
-	var size = 32
-	var img = Image.create(size, size, false, Image.FORMAT_RGBA8)
-	img.fill(Color(0, 0, 0, 0))
-	
-	var c_skin = Color(0.98, 0.76, 0.42, 1.0)
-	var c_light = Color(1.0, 0.9, 0.65, 1.0)
-	var c_shadow = Color(0.72, 0.45, 0.22, 1.0)
-	var c_outline = Color(0.18, 0.12, 0.08, 1.0)
-	var c_glove = Color(0.85, 0.25, 0.18, 1.0)
-	var c_aura = Color(1.0, 0.85, 0.3, 0.8)
-	
-	for x in range(10, 22):
-		for y in range(23, 29):
-			img.set_pixel(x, y, c_glove)
-			
-	for x in range(8, 24):
-		for y in range(9, 23):
-			img.set_pixel(x, y, c_skin)
-			
-	for x in range(9, 23):
-		for y in range(9, 12):
-			img.set_pixel(x, y, c_light)
-			
-	for y in [13, 17, 20]:
-		for x in range(9, 23):
-			img.set_pixel(x, y, c_shadow)
-			
-	for x in range(6, 12):
-		for y in range(15, 21):
-			img.set_pixel(x, y, c_skin)
-			
-	var spark_pixels = [[5,6], [6,5], [25,6], [26,5], [4,14], [27,14], [5,22], [26,22]]
-	for p in spark_pixels:
-		img.set_pixel(p[0], p[1], c_aura)
-		
-	for x in range(size):
-		for y in range(size):
-			if img.get_pixel(x, y).a > 0 and img.get_pixel(x, y) != c_aura:
-				for dir in [Vector2i(-1,0), Vector2i(1,0), Vector2i(0,-1), Vector2i(0,1)]:
-					var nx = x + dir.x
-					var ny = y + dir.y
-					if nx >= 0 and nx < size and ny >= 0 and ny < size:
-						if img.get_pixel(nx, ny).a == 0:
-							img.set_pixel(nx, ny, c_outline)
-
-	return ImageTexture.create_from_image(img)
 
 func _create_circle_texture(fill_color: Color, border_color: Color) -> ImageTexture:
 	var size = 128
