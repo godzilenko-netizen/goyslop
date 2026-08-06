@@ -1,12 +1,14 @@
-[gd_resource type="Resource" script_class="SkillData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="SkillData" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/data/skill_data.gd" id="1_skill_data"]
+[ext_resource type="Texture2D" path="res://textures/skills/ice_arrow.png" id="2_icon"]
 
 [resource]
 script = ExtResource("1_skill_data")
 skill_id = &"ice_arrow"
 display_name = "Ледяная стрела"
 description = "Наносит точечный урон и замедляет цель."
+icon = ExtResource("2_icon")
 hotbar_slot = 3
 damage = 45
 mana_cost = 20
