@@ -48,7 +48,6 @@ func _ready() -> void:
 	sort_button.flat = true
 	sort_button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	sort_button.pressed.connect(sort_inventory)
-	_seed_starter_items()
 	_update_gold()
 
 
@@ -77,7 +76,7 @@ func _close() -> void:
 	if not is_open:
 		return
 	is_open = false
-	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	var vp := get_viewport().get_visible_rect().size
 	var tw := create_tween()
 	tw.tween_property(root_panel, "position:x", vp.x, 0.24).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_IN)
@@ -268,12 +267,3 @@ func _first_empty_grid_slot() -> InventorySlot:
 func _update_gold() -> void:
 	if gold_label:
 		gold_label.text = str(gold)
-
-
-func _seed_starter_items() -> void:
-	add_item({"id": "bronze_sword", "name": "Бронзовый\nмеч", "slot": "weapon", "rarity": "rare", "description": "+12 к урону"})
-	add_item({"id": "ice_wand", "name": "Ледяной\nжезл", "slot": "weapon", "rarity": "magic", "description": "+10% к силе льда"})
-	add_item({"id": "leather_helmet", "name": "Кожаный\nшлем", "slot": "helmet", "description": "+5 к защите"})
-	add_item({"id": "health_potion", "name": "Зелье HP", "effect": "health", "power": 35, "quantity": 3, "max_stack": 10, "rarity": "magic", "description": "Восстанавливает 35 здоровья"})
-	add_item({"id": "mana_potion", "name": "Зелье MP", "effect": "mana", "power": 25, "quantity": 3, "max_stack": 10, "rarity": "magic", "description": "Восстанавливает 25 маны"})
-	set_gold(125)

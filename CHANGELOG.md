@@ -2,11 +2,13 @@
 
 ## [Unreleased]
 ### Fixed
-- Inventory is now functional: 60 storage slots support stacking, drag-and-drop, sorting, equipment validation, consumable use, starter items, gold, and state serialization.
+- Inventory is now functional: 60 storage slots support stacking, drag-and-drop, sorting, equipment validation, consumable use, gold, and state serialization.
+- Removed the temporary starter equipment, potions, and gold; a new inventory now starts empty.
+- Restored the fixed isometric ARPG camera; the mouse cursor remains visible for world aiming and inventory interaction.
 - Player movement and combat input are locked while the inventory is open.
 - Troll now has exactly one collision shape, properly disables it while dead, and respawns exactly 10 seconds after death.
 - Troll enters Aggro when the player comes within `aggro_range`, as described.
-- Knockback keeps player controls locked until the character actually lands before playing Getting Up.
+- Knockback waits for the player to actually leave the ground, then keeps controls locked until landing before playing Getting Up.
 - Overlapping freeze and burn effects no longer leave the Troll permanently slowed.
 - Removed duplicate HUD tooltip construction and corrected scene `load_steps` metadata so UI nodes are no longer skipped during instantiation.
 - Windows Compatibility rendering is pinned to OpenGL 3 to avoid Vulkan surface errors.

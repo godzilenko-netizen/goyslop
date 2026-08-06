@@ -67,6 +67,7 @@ func _ready() -> void:
 	print("Game save: ", save_name)
 	if spring_arm:
 		spring_arm.add_excluded_object(get_rid())
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		
 	if inventory_ui:
 		inventory_ui.player_ref = self
@@ -439,13 +440,15 @@ func _knockdown() -> void:
 		anim_player.speed_scale = 1.5
 		anim_player.play("mixamo/FallingBack", 0.1)
 
-	# The launch begins while the body still reports its previous floor state.
-	# Wait one physics frame, then keep controls locked until the body lands.
-	await get_tree().physics_frame
-	var airborne_time := 0.0
-	while not is_on_floor() and airborne_time < 5.0:
+	# The hit can arrive after this body already ran its physics step. Wait for
+	# the upward impulse to really lift the body before checking for landing.
+	while is_on_floor() and velocity.y > 0.0:
 		await get_tree().physics_frame
-		airborne_time += get_physics_process_delta_time()
+
+	# Never start Getting Up in mid-air. Controls remain locked until a real
+	# floor contact is reported by move_and_slide().
+	while not is_on_floor():
+		await get_tree().physics_frame
 
 	if is_dead:
 		return
