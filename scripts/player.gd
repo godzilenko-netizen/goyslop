@@ -165,13 +165,6 @@ func _physics_process(delta: float) -> void:
 		if not is_on_floor(): velocity.y -= gravity * delta
 		move_and_slide()
 		return
-	if inventory_ui and inventory_ui.get("is_open") == true:
-		velocity.x = move_toward(velocity.x, 0, friction * delta)
-		velocity.z = move_toward(velocity.z, 0, friction * delta)
-		if not is_on_floor(): velocity.y -= gravity * delta
-		move_and_slide()
-		return
-
 	_regen_timer += delta
 	if _regen_timer >= 1.0:
 		_regen_timer -= 1.0

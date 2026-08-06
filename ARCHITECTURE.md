@@ -23,6 +23,7 @@ PlayerStats / HealthComponent / Player combat
 - `scripts/player.gd` coordinates input, movement, animation, and combat using the components and resources above.
 - `scripts/projectile.gd` receives a `SkillData` resource before entering the scene tree.
 - `scripts/hud.gd` subscribes to player-stat signals and builds skill cards from `SkillData`.
+- `scripts/pause_menu.gd` owns pause state and scene navigation; it runs while the gameplay tree is paused.
 
 ## Rules for new gameplay code
 

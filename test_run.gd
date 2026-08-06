@@ -28,6 +28,15 @@ func _run() -> void:
 
 	var world := scene.get_node_or_null("SubViewportContainer/SubViewport/World")
 	_check(world != null, "World node is missing")
+	var pause_menu = scene.get_node_or_null("PauseMenu")
+	_check(pause_menu != null, "PauseMenu is missing")
+	if pause_menu:
+		pause_menu.open_pause()
+		_check(paused, "Opening PauseMenu must pause the scene tree")
+		_check(pause_menu.is_open, "PauseMenu must report its open state")
+		_check(pause_menu.main_menu_button != null, "PauseMenu must provide a main-menu button")
+		pause_menu.close_pause()
+		_check(not paused, "Closing PauseMenu must resume the scene tree")
 	var player = world.get_node_or_null("Player") if world else null
 	var troll = world.get_node_or_null("Troll") if world else null
 	_check(player != null, "Player node is missing")
@@ -76,6 +85,12 @@ func _run() -> void:
 			inventory.sort_inventory()
 			inventory._open()
 			_check(Input.mouse_mode == Input.MOUSE_MODE_VISIBLE, "Opening inventory must keep the cursor visible")
+			var position_before_moving: Vector3 = player.global_position
+			Input.action_press("move_right")
+			for _movement_frame in range(12):
+				await physics_frame
+			Input.action_release("move_right")
+			_check(player.global_position.x > position_before_moving.x + 0.01, "Player must keep moving while inventory is open")
 			inventory._close()
 			_check(Input.mouse_mode == Input.MOUSE_MODE_VISIBLE, "Closing inventory must keep the gameplay cursor visible")
 
@@ -110,7 +125,7 @@ func _run() -> void:
 	scene.queue_free()
 	await process_frame
 	if failures.is_empty():
-		print("TEST PASSED: main scene, empty inventory, fixed camera, troll states and knockdown")
+		print("TEST PASSED: main scene, pause menu, inventory movement, fixed camera, troll states and knockdown")
 		quit(0)
 	else:
 		print("TEST FAILED: %d failure(s)" % failures.size())
