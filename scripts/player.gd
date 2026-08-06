@@ -48,11 +48,13 @@ var is_knocked_down: bool = false
 
 var _regen_timer: float = 0.0
 
-@onready var camera: Camera3D = $CameraPivot/SpringArm3D/Camera3D
-@onready var spring_arm: SpringArm3D = $CameraPivot/SpringArm3D
+@onready var camera:       Camera3D   = $CameraPivot/SpringArm3D/Camera3D
+@onready var spring_arm:   SpringArm3D = $CameraPivot/SpringArm3D
+@onready var camera_pivot: Node3D     = $CameraPivot
 @onready var visual_mesh: Node3D = $Visuals
 @onready var attack_hitbox: Area3D = $Visuals/AttackHitbox
 @onready var hud: CanvasLayer = $HUD
+@onready var inventory_ui: CanvasLayer = $InventoryUI
 
 var anim_player: AnimationPlayer = null
 var is_moving_backwards_state: bool = false
@@ -60,9 +62,12 @@ var is_moving_backwards_state: bool = false
 func _ready() -> void:
 	randomize()
 	add_to_group("Player")
-	print("рџ”Ґ Р РµС‚СЂРѕ 3D Р­РєС€РЅ. РРјСЏ СЃРѕС…СЂР°РЅРµРЅРёСЏ: ", Global.current_save_name)
+	print("рџ”Ґ Р РµС‚СЂРѕ 3D Р­РєС€РЅ. Р˜РјСЏ СЃРѕС…СЂР°РЅРµРЅРёСЏ: ", Global.current_save_name)
 	if spring_arm:
 		spring_arm.add_excluded_object(get_rid())
+		
+	if inventory_ui:
+		inventory_ui.player_ref = self
 		
 	# Р Р°Р·РІРѕСЂРѕС‚ РјРѕРґРµР»Рё Р»РёС†РѕРј РІРїРµСЂРµРґ Рё Р°РІС‚Рѕ-РјР°СЃС€С‚Р°Р± 1.8Рј
 	if has_node("Visuals/CharacterModel"):
@@ -201,6 +206,21 @@ func _physics_process(delta: float) -> void:
 	# РЎРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ РєР°РјРµСЂС‹ РјРёРЅРёРєР°СЂС‚С‹ Р·Р° РёРіСЂРѕРєРѕРј
 	_update_minimap_camera()
 
+# Shift camera so player appears left-center when inventory is open.
+# We tween camera.h_offset (camera-local horizontal shift) which works
+# correctly for top-down isometric cameras in Godot 4.
+func shift_camera_for_ui(ui_open: bool) -> void:
+	if not camera: return
+	var tw := create_tween()
+	# Use PROCESS mode so this works even if tree is paused in future
+	tw.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	# -7.0 units shifts character to left ~40% of a 1920-wide screen
+	# at typical spring_arm length / FOV. Tune here if needed.
+	var target: float = 4.0 if ui_open else 0.0
+	tw.tween_property(camera, "h_offset", target, 0.35) \
+	  .set_trans(Tween.TRANS_CUBIC) \
+	  .set_ease(Tween.EASE_OUT if ui_open else Tween.EASE_IN)
+
 func _update_animations(direction: Vector3, is_sprinting: bool) -> void:
 	if not anim_player:
 		anim_player = _find_anim_player($Visuals)
@@ -260,6 +280,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		cast_fireball()
 	elif event.is_action_pressed("skill_3"):
 		cast_ice_arrow()
+	elif event.is_action_pressed("inventory"):
+		print("Inventory input received!")
+		if inventory_ui and inventory_ui.has_method("toggle"):
+			inventory_ui.toggle()
 	elif event.is_action_pressed("interact"):
 		interact()
 	elif event is InputEventKey and event.pressed and not event.echo:

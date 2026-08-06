@@ -5,7 +5,7 @@ func _init():
     root.add_child(s)
     
     for i in range(60):
-        await get_tree().process_frame
+        await process_frame
         
     print("Test passed.")
     quit()

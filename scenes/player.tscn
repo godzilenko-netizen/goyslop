@@ -1,8 +1,9 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://scripts/player.gd" id="1_player_gd"]
 [ext_resource type="PackedScene" path="res://scenes/hud.tscn" id="2_hud_scene"]
 [ext_resource type="PackedScene" path="res://models/characters/player/animations/normal/Idle.fbx" id="3_character_blend"]
+[ext_resource type="PackedScene" path="res://scenes/inventory_ui.tscn" id="4_inv_scene"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 radius = 0.4
@@ -52,3 +53,5 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 fov = 50.0
 
 [node name="HUD" parent="." instance=ExtResource("2_hud_scene")]
+
+[node name="InventoryUI" parent="." instance=ExtResource("4_inv_scene")]

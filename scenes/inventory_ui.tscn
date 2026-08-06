@@ -1,0 +1,501 @@
+[gd_scene load_steps=14 format=3]
+
+[ext_resource type="Script" path="res://scripts/inventory_ui.gd" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="SB_outer"]
+bg_color = Color(0.10, 0.085, 0.062, 0.99)
+border_width_left = 8
+border_width_top = 8
+border_width_right = 4
+border_width_bottom = 8
+border_color = Color(0.55, 0.40, 0.10, 1.0)
+corner_radius_top_left = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0.0, 0.0, 0.0, 0.95)
+shadow_size = 40
+shadow_offset = Vector2(-10, 0)
+
+[sub_resource type="StyleBoxFlat" id="SB_inner_border"]
+bg_color = Color(0.065, 0.054, 0.038, 0.99)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.28, 0.20, 0.07, 1.0)
+corner_radius_top_left = 10
+corner_radius_top_right = 0
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="SB_section_equip"]
+bg_color = Color(0.050, 0.042, 0.030, 0.97)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.38, 0.28, 0.09, 1.0)
+corner_radius_top_left = 7
+corner_radius_top_right = 7
+corner_radius_bottom_right = 7
+corner_radius_bottom_left = 7
+shadow_color = Color(0.0, 0.0, 0.0, 0.7)
+shadow_size = 8
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="SB_grid_bg"]
+bg_color = Color(0.038, 0.030, 0.020, 0.98)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.38, 0.28, 0.09, 1.0)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+shadow_color = Color(0.0, 0.0, 0.0, 0.8)
+shadow_size = 12
+shadow_offset = Vector2(0, 5)
+
+[sub_resource type="StyleBoxFlat" id="SB_slot_normal"]
+bg_color = Color(0.030, 0.024, 0.016, 0.97)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.50, 0.36, 0.10, 1.0)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+shadow_color = Color(0.0, 0.0, 0.0, 0.85)
+shadow_size = 5
+shadow_offset = Vector2(1, 2)
+
+[sub_resource type="StyleBoxFlat" id="SB_slot_large"]
+bg_color = Color(0.025, 0.020, 0.013, 0.97)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.55, 0.40, 0.10, 1.0)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+shadow_color = Color(0.0, 0.0, 0.0, 0.9)
+shadow_size = 8
+shadow_offset = Vector2(1, 3)
+
+[sub_resource type="StyleBoxFlat" id="SB_slot_accent"]
+bg_color = Color(0.035, 0.026, 0.012, 0.97)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.70, 0.52, 0.14, 1.0)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+shadow_color = Color(0.55, 0.40, 0.06, 0.25)
+shadow_size = 6
+shadow_offset = Vector2(0, 2)
+
+[sub_resource type="StyleBoxFlat" id="SB_divider"]
+bg_color = Color(0.50, 0.36, 0.08, 1.0)
+
+[sub_resource type="StyleBoxFlat" id="SB_footer"]
+bg_color = Color(0.058, 0.046, 0.030, 0.99)
+border_width_left = 2
+border_width_top = 3
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.42, 0.30, 0.08, 1.0)
+corner_radius_top_left = 0
+corner_radius_top_right = 0
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="SB_gold_box"]
+bg_color = Color(0.020, 0.016, 0.010, 0.97)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.55, 0.40, 0.10, 1.0)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="InventoryUI" type="CanvasLayer"]
+layer = 10
+process_mode = 3
+script = ExtResource("1_script")
+
+[node name="RootPanel" type="PanelContainer" parent="."]
+anchors_preset = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 100.0
+offset_bottom = 100.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_styles/panel = SubResource("SB_outer")
+
+[node name="InnerBorder" type="PanelContainer" parent="RootPanel"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_inner_border")
+
+[node name="OM" type="MarginContainer" parent="RootPanel/InnerBorder"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
+
+[node name="VBox" type="VBoxContainer" parent="RootPanel/InnerBorder/OM"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TitleBar" type="HBoxContainer" parent="RootPanel/InnerBorder/OM/VBox"]
+layout_mode = 2
+
+[node name="CornerL" type="Label" parent="RootPanel/InnerBorder/OM/VBox/TitleBar"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.60, 0.44, 0.10, 1)
+theme_override_font_sizes/font_size = 14
+text = "✦"
+
+[node name="TitleText" type="Label" parent="RootPanel/InnerBorder/OM/VBox/TitleBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.82, 0.64, 0.20, 1)
+theme_override_font_sizes/font_size = 12
+text = "С Н А Р Я Ж Е Н И Е"
+horizontal_alignment = 1
+
+[node name="CornerR" type="Label" parent="RootPanel/InnerBorder/OM/VBox/TitleBar"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.60, 0.44, 0.10, 1)
+theme_override_font_sizes/font_size = 14
+text = "✦"
+
+[node name="Sep1" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox"]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_divider")
+
+[node name="EquipSection" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("SB_section_equip")
+
+[node name="ESM" type="MarginContainer" parent="RootPanel/InnerBorder/OM/VBox/EquipSection"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="EquipVBox" type="VBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Row1" type="HBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="LeftCol" type="VBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SlotWeapon" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/LeftCol"]
+custom_minimum_size = Vector2(120, 260)
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_slot_large")
+
+[node name="L" type="Label" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/LeftCol/SlotWeapon"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.32, 0.10, 0.75)
+theme_override_font_sizes/font_size = 11
+text = "ОРУЖИЕ 1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CenterCol" type="VBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="HatRow" type="HBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/CenterCol"]
+layout_mode = 2
+theme_override_constants/separation = 8
+size_flags_horizontal = 3
+
+[node name="HatSpacer1" type="Control" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/CenterCol/HatRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HatDummyLeft" type="Control" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/CenterCol/HatRow"]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+
+[node name="SlotHelmet" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/CenterCol/HatRow"]
+custom_minimum_size = Vector2(88, 88)
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_slot_normal")
+
+[node name="L" type="Label" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/CenterCol/HatRow/SlotHelmet"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.32, 0.10, 0.75)
+theme_override_font_sizes/font_size = 11
+text = "ШЛЕМ"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SlotAmulet" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/CenterCol/HatRow"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("SB_slot_accent")
+
+[node name="L" type="Label" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/CenterCol/HatRow/SlotAmulet"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.70, 0.52, 0.14, 0.85)
+theme_override_font_sizes/font_size = 10
+text = "АМУЛЕТ"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HatSpacer2" type="Control" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/CenterCol/HatRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ArmorRow" type="HBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/CenterCol"]
+layout_mode = 2
+theme_override_constants/separation = 8
+size_flags_horizontal = 3
+
+[node name="ArmorSpacer1" type="Control" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/CenterCol/ArmorRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SlotRing1" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/CenterCol/ArmorRow"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("SB_slot_accent")
+
+[node name="L" type="Label" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/CenterCol/ArmorRow/SlotRing1"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.70, 0.52, 0.14, 0.85)
+theme_override_font_sizes/font_size = 10
+text = "КОЛЬЦО 1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SlotArmor" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/CenterCol/ArmorRow"]
+custom_minimum_size = Vector2(116, 116)
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_slot_large")
+
+[node name="L" type="Label" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/CenterCol/ArmorRow/SlotArmor"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.32, 0.10, 0.75)
+theme_override_font_sizes/font_size = 11
+text = "БРОНЯ"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SlotRing2" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/CenterCol/ArmorRow"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("SB_slot_accent")
+
+[node name="L" type="Label" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/CenterCol/ArmorRow/SlotRing2"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.70, 0.52, 0.14, 0.85)
+theme_override_font_sizes/font_size = 10
+text = "КОЛЬЦО 2"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ArmorSpacer2" type="Control" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/CenterCol/ArmorRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="BeltRow" type="HBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/CenterCol"]
+layout_mode = 2
+theme_override_constants/separation = 8
+size_flags_horizontal = 3
+
+[node name="BeltSpacer1" type="Control" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/CenterCol/BeltRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SlotAcc1" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/CenterCol/BeltRow"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("SB_slot_accent")
+
+[node name="L" type="Label" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/CenterCol/BeltRow/SlotAcc1"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.70, 0.52, 0.14, 0.85)
+theme_override_font_sizes/font_size = 9
+text = "АКСЕС. 1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SlotBelt" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/CenterCol/BeltRow"]
+custom_minimum_size = Vector2(116, 64)
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_slot_normal")
+
+[node name="L" type="Label" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/CenterCol/BeltRow/SlotBelt"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.32, 0.10, 0.75)
+theme_override_font_sizes/font_size = 10
+text = "ПОЯС"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SlotAcc2" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/CenterCol/BeltRow"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("SB_slot_accent")
+
+[node name="L" type="Label" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/CenterCol/BeltRow/SlotAcc2"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.70, 0.52, 0.14, 0.85)
+theme_override_font_sizes/font_size = 9
+text = "АКСЕС. 2"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BeltSpacer2" type="Control" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/CenterCol/BeltRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="RightCol" type="VBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SlotShield" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/RightCol"]
+custom_minimum_size = Vector2(120, 260)
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_slot_large")
+
+[node name="L" type="Label" parent="RootPanel/InnerBorder/OM/VBox/EquipSection/ESM/EquipVBox/Row1/RightCol/SlotShield"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.32, 0.10, 0.75)
+theme_override_font_sizes/font_size = 11
+text = "ОРУЖИЕ 2"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+
+[node name="Sep2" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox"]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_divider")
+
+[node name="GridTitleBar" type="HBoxContainer" parent="RootPanel/InnerBorder/OM/VBox"]
+layout_mode = 2
+
+[node name="GCornerL" type="Label" parent="RootPanel/InnerBorder/OM/VBox/GridTitleBar"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.60, 0.44, 0.10, 1)
+theme_override_font_sizes/font_size = 14
+text = "✦"
+
+[node name="GridTitleText" type="Label" parent="RootPanel/InnerBorder/OM/VBox/GridTitleBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.82, 0.64, 0.20, 1)
+theme_override_font_sizes/font_size = 12
+text = "И Н В Е Н Т А Р Ь"
+horizontal_alignment = 1
+
+[node name="GCornerR" type="Label" parent="RootPanel/InnerBorder/OM/VBox/GridTitleBar"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.60, 0.44, 0.10, 1)
+theme_override_font_sizes/font_size = 14
+text = "✦"
+
+[node name="GridCard" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_grid_bg")
+
+[node name="GridMargin" type="MarginContainer" parent="RootPanel/InnerBorder/OM/VBox/GridCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="GridRoot" type="GridContainer" parent="RootPanel/InnerBorder/OM/VBox/GridCard/GridMargin"]
+columns = 10
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Footer" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_footer")
+
+[node name="FM" type="MarginContainer" parent="RootPanel/InnerBorder/OM/VBox/Footer"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 6
+
+[node name="FHBox" type="HBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/Footer/FM"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="GoldBox" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox/Footer/FM/FHBox"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_gold_box")
+
+[node name="GBM" type="MarginContainer" parent="RootPanel/InnerBorder/OM/VBox/Footer/FM/FHBox/GoldBox"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 2
+
+[node name="GBoxH" type="HBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/Footer/FM/FHBox/GoldBox/GBM"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="GoldIcon" type="Label" parent="RootPanel/InnerBorder/OM/VBox/Footer/FM/FHBox/GoldBox/GBM/GBoxH"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.92, 0.72, 0.12, 1)
+theme_override_font_sizes/font_size = 16
+text = "⬡"
+
+[node name="GoldAmt" type="Label" parent="RootPanel/InnerBorder/OM/VBox/Footer/FM/FHBox/GoldBox/GBM/GBoxH"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.85, 0.66, 0.20, 1)
+theme_override_font_sizes/font_size = 13
+text = "0"
+
+[node name="FSpacer" type="Control" parent="RootPanel/InnerBorder/OM/VBox/Footer/FM/FHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SortLbl" type="Label" parent="RootPanel/InnerBorder/OM/VBox/Footer/FM/FHBox"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.35, 0.26, 0.10, 0.9)
+theme_override_font_sizes/font_size = 10
+text = "[ С О Р Т И Р О В К А ]"
