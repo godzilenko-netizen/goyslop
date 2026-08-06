@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/inventory_ui.gd" id="1_script"]
 [ext_resource type="Script" path="res://scripts/inventory_slot.gd" id="2_slot"]
+[ext_resource type="Theme" path="res://themes/diablo2_theme.tres" id="3_theme"]
 
 [sub_resource type="StyleBoxFlat" id="SB_outer"]
 bg_color = Color(0.10, 0.085, 0.062, 0.99)

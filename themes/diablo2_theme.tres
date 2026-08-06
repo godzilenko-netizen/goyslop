@@ -1,0 +1,85 @@
+[gd_resource type="Theme" load_steps=7 format=3]
+
+[sub_resource type="StyleBoxFlat" id="SB_outer"]
+bg_color = Color(0.048, 0.040, 0.030, 0.98)
+border_width_left = 6
+border_width_top = 6
+border_width_right = 4
+border_width_bottom = 6
+border_color = Color(0.55, 0.40, 0.10, 1.0)
+corner_radius_top_left = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0.0, 0.0, 0.0, 0.90)
+shadow_size = 32
+shadow_offset = Vector2(-8, 0)
+
+[sub_resource type="StyleBoxFlat" id="SB_section"]
+bg_color = Color(0.038, 0.032, 0.024, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.38, 0.28, 0.09, 1.0)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="SB_btn_normal"]
+bg_color = Color(0.08, 0.06, 0.04, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.45, 0.34, 0.10, 1.0)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="SB_btn_hover"]
+bg_color = Color(0.14, 0.10, 0.06, 0.98)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.85, 0.65, 0.18, 1.0)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+shadow_color = Color(0.85, 0.65, 0.18, 0.3)
+shadow_size = 6
+
+[sub_resource type="StyleBoxFlat" id="SB_btn_pressed"]
+bg_color = Color(0.03, 0.02, 0.01, 0.99)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.60, 0.44, 0.12, 1.0)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="SB_slot_accent"]
+bg_color = Color(0.035, 0.026, 0.012, 0.97)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.70, 0.52, 0.14, 1.0)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+shadow_color = Color(0.55, 0.40, 0.06, 0.25)
+shadow_size = 6
+shadow_offset = Vector2(0, 2)
+
+[resource]
+Button/styles/hover = SubResource("SB_btn_hover")
+Button/styles/normal = SubResource("SB_btn_normal")
+Button/styles/pressed = SubResource("SB_btn_pressed")
+PanelContainer/styles/panel = SubResource("SB_outer")
