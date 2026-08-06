@@ -1,6 +1,8 @@
 # Changelog
 
 ## [Unreleased]
+Полное русское описание работ за день: [`ИЗМЕНЕНИЯ_2026-08-06.md`](./ИЗМЕНЕНИЯ_2026-08-06.md).
+
 ### Architecture
 - Added data-driven `SkillData` resources for basic attack, Fireball, and Ice Arrow; HUD and projectile behavior now use the same values.
 - Added `PlayerStats` and reusable `HealthComponent` nodes with signals for gameplay/UI synchronization.
