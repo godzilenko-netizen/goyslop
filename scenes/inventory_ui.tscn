@@ -136,6 +136,7 @@ process_mode = 3
 script = ExtResource("1_script")
 
 [node name="RootPanel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
 anchors_preset = 0
 offset_left = 0.0
 offset_top = 0.0
@@ -450,6 +451,7 @@ theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
 [node name="GridRoot" type="GridContainer" parent="RootPanel/InnerBorder/OM/VBox/GridCard/GridMargin"]
+unique_name_in_owner = true
 columns = 10
 layout_mode = 2
 size_flags_horizontal = 4

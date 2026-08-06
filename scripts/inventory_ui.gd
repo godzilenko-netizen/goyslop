@@ -1,6 +1,7 @@
 extends CanvasLayer
 
 const InventoryModelType = preload("res://scripts/data/inventory_model.gd")
+const InventorySlot = preload("res://scripts/inventory_slot.gd")
 
 const GRID_COLS := 10
 const GRID_ROWS := 6
@@ -9,8 +10,8 @@ const MARGIN_TOP := 16.0
 const MARGIN_BOTTOM := 115.0
 const MARGIN_RIGHT := 14.0
 
-@onready var root_panel: Control = $RootPanel
-@onready var grid_root: GridContainer = $RootPanel/InnerBorder/OM/VBox/GridCard/GridMargin/GridRoot
+@onready var root_panel: Control = %RootPanel
+@onready var grid_root: GridContainer = %GridRoot
 @onready var sort_button: Button = $RootPanel/InnerBorder/OM/VBox/Footer/FM/FHBox/SortLbl
 @onready var gold_label: Label = $RootPanel/InnerBorder/OM/VBox/Footer/FM/FHBox/GoldBox/GBM/GBoxH/GoldAmt
 
