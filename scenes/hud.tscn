@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://scripts/hud.gd" id="1_hud_gd"]
 
@@ -43,18 +43,6 @@ corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tooltip_bg"]
-bg_color = Color(0.06, 0.07, 0.1, 0.95)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.8, 0.65, 0.3, 1.0)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_minimap_bg"]
 bg_color = Color(0.05, 0.05, 0.08, 0.9)
@@ -227,55 +215,6 @@ theme_override_font_sizes/font_size = 13
 text = "50 / 50"
 horizontal_alignment = 1
 vertical_alignment = 1
-
-# Карточка характеристик первого скилла (Удар кулаком) прямо над слотом ЛКМ
-[node name="Skill1TooltipCard" type="PanelContainer" parent="Control"]
-visible = false
-custom_minimum_size = Vector2(160, 130)
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -195.0
-offset_top = -235.0
-offset_right = -35.0
-offset_bottom = -105.0
-grow_horizontal = 2
-grow_vertical = 0
-theme_override_styles/panel = SubResource("StyleBoxFlat_tooltip_bg")
-
-[node name="Margin" type="MarginContainer" parent="Control/Skill1TooltipCard"]
-layout_mode = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 6
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 6
-
-[node name="VBox" type="VBoxContainer" parent="Control/Skill1TooltipCard/Margin"]
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="Title" type="RichTextLabel" parent="Control/Skill1TooltipCard/Margin/VBox"]
-layout_mode = 2
-bbcode_enabled = true
-text = "[center][b][color=#ffd700]Удар кулаком[/color][/b][/center]"
-fit_content = true
-
-[node name="Stats" type="RichTextLabel" parent="Control/Skill1TooltipCard/Margin/VBox"]
-layout_mode = 2
-bbcode_enabled = true
-text = "[font_size=10][color=#ff6b6b]⚔️ Урон: 25[/color]
-[color=#ffd166]⏳ Перезарядка: 0.6с[/color]
-[color=#4cc9f0]💧 Расход: 0 MP[/color][/font_size]"
-fit_content = true
-
-[node name="Desc" type="RichTextLabel" parent="Control/Skill1TooltipCard/Margin/VBox"]
-layout_mode = 2
-bbcode_enabled = true
-text = "[font_size=9][color=#a0a5b5]Быстрая 3D-атака кулаками перед собой.[/color][/font_size]"
-fit_content = true
 
 [node name="BottomCenterPanel" type="PanelContainer" parent="Control"]
 layout_mode = 1

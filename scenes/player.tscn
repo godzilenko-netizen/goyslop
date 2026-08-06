@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" path="res://scenes/hud.tscn" id="2_hud_scene"]
 [ext_resource type="PackedScene" path="res://models/characters/player/animations/normal/Idle.fbx" id="3_character_blend"]
 [ext_resource type="PackedScene" path="res://scenes/inventory_ui.tscn" id="4_inv_scene"]
+[ext_resource type="Script" path="res://scripts/components/player_stats.gd" id="5_player_stats"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1"]
 radius = 0.4
@@ -24,6 +25,9 @@ script = ExtResource("1_player_gd")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
 shape = SubResource("CapsuleShape3D_1")
+
+[node name="PlayerStats" type="Node" parent="."]
+script = ExtResource("5_player_stats")
 
 [node name="Visuals" type="Node3D" parent="."]
 

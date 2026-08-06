@@ -1,5 +1,7 @@
 extends Area3D
 
+const SkillDataType = preload("res://scripts/data/skill_data.gd")
+
 @export var speed: float = 20.0
 @export var damage: float = 35.0
 @export var lifetime: float = 3.0
@@ -8,11 +10,15 @@ extends Area3D
 @export var explosion_radius: float = 4.5
 @export var status_duration: float = 3.5
 @export var status_potency: float = 0.5
+@export var max_range: float = 0.0
 
 var _shapecast: ShapeCast3D
+var skill_data: SkillDataType = null
 var shooter: Node = null
 var direction: Vector3 = Vector3.FORWARD
 var _elapsed: float = 0.0
+var _traveled: float = 0.0
+var _status_tick_damage: int = 0
 var _spin_speed: float = 3.5
 var _hit_processed: bool = false
 
@@ -23,6 +29,7 @@ var _hit_processed: bool = false
 
 
 func _ready() -> void:
+	_apply_skill_data()
 	body_entered.connect(_on_impact)
 	area_entered.connect(_on_impact)
 	
@@ -56,6 +63,21 @@ func _ready() -> void:
 	_configure_light()
 
 
+func _apply_skill_data() -> void:
+	if not skill_data:
+		return
+	speed = skill_data.projectile_speed
+	damage = skill_data.damage
+	lifetime = skill_data.projectile_lifetime
+	projectile_color = skill_data.projectile_color
+	effect_type = str(skill_data.effect_type)
+	explosion_radius = skill_data.explosion_radius
+	status_duration = skill_data.status_duration
+	status_potency = skill_data.status_potency
+	max_range = skill_data.max_range
+	_status_tick_damage = skill_data.status_tick_damage
+
+
 func _physics_process(delta: float) -> void:
 	_elapsed += delta
 	if _elapsed >= lifetime:
@@ -64,6 +86,10 @@ func _physics_process(delta: float) -> void:
 
 	var move_dist = speed * delta
 	var move_dir = direction.normalized()
+	_traveled += move_dist
+	if max_range > 0.0 and _traveled >= max_range:
+		queue_free()
+		return
 	
 	if is_instance_valid(_shapecast):
 		# Target position is local to the ShapeCast3D node. Since it's unrotated relative to the parent,
@@ -602,7 +628,7 @@ func _process_fire_impact(hit_pos: Vector3, direct_target: Node) -> void:
 				if enemy.has_method("take_damage"):
 					enemy.take_damage(final_damage)
 				if enemy.has_method("apply_burn"):
-					enemy.apply_burn(3.0, 10)
+					enemy.apply_burn(status_duration, _status_tick_damage)
 
 # --- ЛЕДЯНАЯ СТРЕЛА: ТОЧЕЧНЫЙ УРОН + ЗАМОРОЗКА + ЛЕДЯНОЙ ВЗРЫВ ---
 func _process_ice_impact(hit_pos: Vector3, direct_target: Node) -> void:

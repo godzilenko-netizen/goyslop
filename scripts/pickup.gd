@@ -38,12 +38,11 @@ func _process(delta: float) -> void:
 func _on_body_entered(body: Node3D) -> void:
 	if body.is_in_group("Player"):
 		if type == "Health":
-			body.current_hp = body.max_hp
+			if body.has_method("restore_health_to_full"):
+				body.restore_health_to_full()
 		else:
-			body.current_energy = body.max_energy
-			
-		if body.has_method("_update_hud"):
-			body._update_hud()
+			if body.has_method("restore_energy_to_full"):
+				body.restore_energy_to_full()
 			
 		# Optional: Spawn a quick sound or explosion here before queue_free
 		queue_free()

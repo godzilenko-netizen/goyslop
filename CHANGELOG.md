@@ -1,6 +1,35 @@
 # Changelog
 
 ## [Unreleased]
+Полное русское описание работ за день: [`ИЗМЕНЕНИЯ_2026-08-06.md`](./ИЗМЕНЕНИЯ_2026-08-06.md).
+
+### Architecture
+- Added data-driven `SkillData` resources for basic attack, Fireball, and Ice Arrow; HUD and projectile behavior now use the same values.
+- Added `PlayerStats` and reusable `HealthComponent` nodes with signals for gameplay/UI synchronization.
+- Moved inventory state, transactional stacking, equipment validation, sorting, gold, and serialization into `InventoryModel`.
+- Replaced Troll state-name strings with a typed enum and cached animation libraries across actor instances.
+- Reduced per-enemy health-bar rendering from continuous updates to updates only when values change.
+- Added `ARCHITECTURE.md` with dependency rules and extension workflows.
+- Removed the unused legacy `fireball.gd` and `ice_arrow.gd` implementations; active skills use `projectile.gd` plus `SkillData`.
+
+### Fixed
+- Inventory is now functional: 60 storage slots support stacking, drag-and-drop, sorting, equipment validation, consumable use, gold, and state serialization.
+- Removed the temporary starter equipment, potions, and gold; a new inventory now starts empty.
+- Restored the fixed isometric ARPG camera; the mouse cursor remains visible for world aiming and inventory interaction.
+- Player movement remains available while the inventory is open; combat input stays blocked to prevent UI clicks from attacking.
+- Added an Escape pause menu with resume and return-to-main-menu actions.
+- Troll now has exactly one collision shape, properly disables it while dead, and respawns exactly 10 seconds after death.
+- Troll enters Aggro when the player comes within `aggro_range`, as described.
+- Knockback waits for the player to actually leave the ground, then keeps controls locked until landing before playing Getting Up.
+- Skill casts interrupted by death or knockdown no longer spawn a projectile after the interruption.
+- Fireball and Ice Arrow range/status values are now enforced from the same resources shown by the HUD.
+- Overlapping freeze and burn effects no longer leave the Troll permanently slowed.
+- Removed duplicate HUD tooltip construction and corrected scene `load_steps` metadata so UI nodes are no longer skipped during instantiation.
+- Windows Compatibility rendering is pinned to OpenGL 3 to avoid Vulkan surface errors.
+- Replaced smoke-only scripts with asserting scene, HUD, physics, inventory, Troll-state, and knockdown tests.
+- Removed temporary repository patch scripts.
+- Removed the unused duplicate `Trollo.obj`, which referenced a missing material library and broke clean imports.
+
 ### Added
 - **Troll Mob**: Added a new enemy "Troll" with customized logic and behaviors.
   - Implemented 3 states: Circling, Aggro (chasing), and Attacking.
