@@ -158,14 +158,15 @@ func _refresh() -> void:
 		"unique": Color(1.0, 0.48, 0.12),
 	}
 	_item_label.add_theme_color_override("font_color", colors.get(rarity, colors["common"]))
-	var item_size: Vector2i = item.get("grid_size", Vector2i.ONE)
 	var stats_text := ""
-	if int(item.get("armor", 0)) > 0:
-		stats_text = "\nБроня: %d" % int(item.get("armor", 0))
-	tooltip_text = "%s%s\nРазмер: %d×%d\n%s" % [
-		str(item.get("name", "Предмет")), stats_text, item_size.x, item_size.y,
-		str(item.get("description", ""))
-	]
+	var armor_stat := int(item.get("armor", 0))
+	if armor_stat > 0:
+		stats_text = "\nБроня: %d" % armor_stat
+	var desc := str(item.get("description", ""))
+	if not desc.is_empty():
+		tooltip_text = "%s%s\n%s" % [str(item.get("name", "Предмет")), stats_text, desc]
+	else:
+		tooltip_text = "%s%s" % [str(item.get("name", "Предмет")), stats_text]
 
 
 func _get_drag_data(_at_position: Vector2) -> Variant:

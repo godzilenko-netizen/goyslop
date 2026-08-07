@@ -86,6 +86,9 @@ func refresh() -> void:
 		var pr4 := _root_panel.find_child("PR4Val", true, false) as Label
 		if pr4: pr4.text = str(attr.intelligence)
 		
+		var cc2 := _root_panel.find_child("CC2Val", true, false) as Label
+		if cc2: cc2.text = "%.1f%%" % attr.get_total_armor()
+
 		var cc3 := _root_panel.find_child("CC3Val", true, false) as Label
 		if cc3: cc3.text = "%.1f%%" % (attr.get_dodge_chance() * 100.0)
 

@@ -11,5 +11,5 @@ description = "Простой потёртый нагрудник из груб�
 rarity = "common"
 equipment_slot = "armor"
 grid_size = Vector2i(2, 3)
-armor = 4
+armor = 1
 icon = ExtResource("2_icon")

@@ -103,8 +103,23 @@ func _run() -> void:
 			_check(before_state.get("gold", -1) == 0, "Inventory must start without demo gold")
 			_check(inventory.add_item({"id": "test_ring", "name": "Test Ring", "slot": "ring"}), "Inventory must accept a valid item")
 			inventory.sort_inventory()
-			inventory._open()
+			inventory.open()
+			_check(inventory.is_open, "inventory.open() must open the inventory UI")
 			_check(Input.mouse_mode == Input.MOUSE_MODE_VISIBLE, "Opening inventory must keep the cursor visible")
+			
+			# Armor calculation test: 1 armor stat = 0.1 total armor
+			var attr = player.get_node_or_null("CharacterAttributes")
+			_check(attr != null, "CharacterAttributes component must exist")
+			if attr:
+				attr.set_equipment_armor(1)
+				_check(is_equal_approx(attr.get_total_armor(), 0.1), "1 armor stat must give 0.1 total armor")
+				var char_ui = player.get_node_or_null("CharacterUI")
+				if char_ui:
+					char_ui.refresh()
+					var cc2_lbl = char_ui.get_node_or_null("RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupCombat/GCM/GCVBox/CombatRow2/CC2Val") as Label
+					_check(cc2_lbl != null and cc2_lbl.text == "0.1%", "Character UI armor label CC2Val must display 0.1%")
+				attr.set_equipment_armor(0)
+
 			player.take_damage(5)
 			var inventory_flask_charges: int = player.health_flask.charges
 			var flask_input := InputEventAction.new()
@@ -122,7 +137,7 @@ func _run() -> void:
 				await physics_frame
 			Input.action_release("move_right")
 			_check(player.global_position.x > position_before_moving.x + 0.01, "Player must keep moving while inventory is open")
-			inventory._close()
+			inventory.close()
 			_check(Input.mouse_mode == Input.MOUSE_MODE_VISIBLE, "Closing inventory must keep the gameplay cursor visible")
 
 		# Тестирование сундука 13x13

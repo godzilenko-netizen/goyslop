@@ -18,6 +18,7 @@ var _mana_bonus: int = 0
 var _hp_regen_per_sec: float = 0.0
 var _mana_regen_per_sec: float = 0.0
 var _dodge_chance: float = 0.0
+var _armor_value: float = 0.0
 
 # ─── Итоговые максимумы ───────────────────────────────────────────────────────
 var max_hp: int:
@@ -63,6 +64,8 @@ func apply_attribute_bonuses(attr: Node) -> void:
 	_hp_regen_per_sec  = attr.get_hp_regen()
 	_mana_regen_per_sec = attr.get_mana_regen()
 	_dodge_chance      = attr.get_dodge_chance()
+	if attr.has_method("get_total_armor"):
+		_armor_value = attr.get_total_armor()
 
 	# Пропорционально масштабировать текущее HP при изменении максимума
 	if old_max_hp > 0 and max_hp != old_max_hp:
@@ -131,8 +134,9 @@ func take_damage(amount: int) -> int:
 	# Проверка уклонения
 	if _dodge_chance > 0.0 and randf() < _dodge_chance:
 		return 0
+	var final_amount := maxi(1, roundi(float(amount) - _armor_value))
 	var previous := current_hp
-	current_hp = maxi(0, current_hp - amount)
+	current_hp = maxi(0, current_hp - final_amount)
 	health_changed.emit(current_hp, max_hp)
 	if current_hp == 0:
 		is_dead = true

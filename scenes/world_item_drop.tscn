@@ -4,7 +4,7 @@
 [ext_resource type="Resource" path="res://data/items/leather_armor.tres" id="2_item"]
 
 [sub_resource type="SphereShape3D" id="SphereShape_drop"]
-radius = 0.5
+radius = 0.7
 
 [sub_resource type="StandardMaterial3D" id="Material_cube"]
 albedo_color = Color(0.28, 0.29, 0.31, 1)
@@ -48,7 +48,7 @@ height = 0.68
 radial_segments = 12
 
 [node name="WorldItemDrop" type="Area3D"]
-collision_layer = 8
+collision_layer = 9
 collision_mask = 0
 script = ExtResource("1_script")
 item_data = ExtResource("2_item")

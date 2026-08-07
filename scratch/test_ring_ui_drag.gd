@@ -17,7 +17,7 @@ func _init() -> void:
 	
 	var player = main_inst.find_child("Player", true, false)
 	var inv_ui = player.get_node_or_null("InventoryUI")
-	inv_ui._open()
+	inv_ui.open()
 	await process_frame
 	
 	var ring_dict = RING_DATA.to_inventory_item()

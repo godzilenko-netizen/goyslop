@@ -30,6 +30,7 @@ signal attributes_changed
 var bonus_strength: int = 0
 var bonus_dexterity: int = 0
 var bonus_intelligence: int = 0
+var equipment_armor_stat: int = 0
 
 
 # ─── Итоговые атрибуты (read-only, пересчитываются через recalculate) ─────────
@@ -91,6 +92,19 @@ func get_magic_crit_chance() -> float:
 ## Скейл критического магического урона: Базово 150% (1.50) + 1% (0.01) за 1 Интеллект
 func get_magic_crit_multiplier() -> float:
 	return 1.50 + (intelligence * 0.01)
+
+## Эффективная броня: 1 единица брони на предмете даёт 0.1 итоговой брони
+func get_armor_value(raw_armor: int) -> float:
+	return raw_armor * 0.1
+
+## Установить суммарный стат брони с экипировки и пересчитать характеристики
+func set_equipment_armor(stat_val: int) -> void:
+	equipment_armor_stat = stat_val
+	recalculate()
+
+## Итоговое значение брони персонажа
+func get_total_armor() -> float:
+	return equipment_armor_stat * 0.1
 
 
 

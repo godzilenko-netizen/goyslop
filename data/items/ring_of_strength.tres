@@ -10,5 +10,5 @@ description = "Старинное резное бронзовое кольцо �
 rarity = "magic"
 equipment_slot = "ring"
 grid_size = Vector2i(1, 1)
-armor = 1
+armor = 0
 icon_path = "res://assets/items/copper_ring.png"

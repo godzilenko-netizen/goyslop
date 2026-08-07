@@ -81,6 +81,14 @@ func toggle() -> void:
 		_open()
 
 
+func open() -> void:
+	_open()
+
+
+func close() -> void:
+	_close()
+
+
 func _open() -> void:
 	if is_open:
 		return
@@ -443,11 +451,30 @@ func _sync_slots() -> void:
 			slot.set_item(item)
 		elif anchor >= 0:
 			slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			slot.size = Vector2(grid_cell_size, grid_cell_size)
+			slot.custom_minimum_size = slot.size
 			slot.set_item({})
 		else:
+			slot.size = Vector2(grid_cell_size, grid_cell_size)
+			slot.custom_minimum_size = slot.size
 			slot.set_item({})
 	for key in equipment_slots:
 		equipment_slots[key].set_item(inventory_model.get_item(inventory_model.equipment_ref(key)))
+	_update_player_equipment_stats()
+
+
+func _update_player_equipment_stats() -> void:
+	if not player_ref or not inventory_model:
+		return
+	var attr: CharacterAttributes = player_ref.get_node_or_null("CharacterAttributes") as CharacterAttributes
+	if not attr:
+		return
+	var total_armor_stat := 0
+	for key in inventory_model.equipment:
+		var item: Dictionary = inventory_model.equipment[key]
+		if not item.is_empty():
+			total_armor_stat += int(item.get("armor", 0))
+	attr.set_equipment_armor(total_armor_stat)
 
 
 func _cell_position(index: int) -> Vector2:

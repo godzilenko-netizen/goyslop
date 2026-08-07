@@ -92,6 +92,10 @@ func _open() -> void:
 	var tw := create_tween()
 	tw.tween_property(root_panel, "position:x", MARGIN_LEFT, 0.30).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
 
+	var inv_ui := _get_inventory_ui()
+	if inv_ui and not inv_ui.is_open:
+		inv_ui.open()
+
 
 
 func close_chest() -> void:
@@ -112,9 +116,20 @@ func close_chest() -> void:
 func _input(event: InputEvent) -> void:
 	if not is_open:
 		return
-	if event.is_action_pressed("ui_cancel") or event.is_action_pressed("inventory"):
+	if event.is_action_pressed("ui_cancel"):
 		close_chest()
 		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed("inventory"):
+		var inv_ui := _get_inventory_ui()
+		if inv_ui:
+			inv_ui.toggle()
+		get_viewport().set_input_as_handled()
+
+
+func _get_inventory_ui() -> Node:
+	if not get_tree() or not get_tree().root:
+		return null
+	return get_tree().root.find_child("InventoryUI", true, false)
 
 
 func _setup_grid() -> void:
@@ -185,8 +200,12 @@ func _sync_slots() -> void:
 			slot.set_item(item)
 		elif anchor >= 0:
 			slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			slot.size = Vector2(grid_cell_size, grid_cell_size)
+			slot.custom_minimum_size = slot.size
 			slot.set_item({})
 		else:
+			slot.size = Vector2(grid_cell_size, grid_cell_size)
+			slot.custom_minimum_size = slot.size
 			slot.set_item({})
 
 

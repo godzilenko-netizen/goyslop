@@ -316,9 +316,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		if _try_pickup_world_loot():
 			return
 		attack()
-	elif event.is_action_pressed("skill_2"):
+	elif event.is_action_pressed("skill_1") or (event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_1):
 		cast_fireball()
-	elif event.is_action_pressed("skill_3"):
+	elif event.is_action_pressed("skill_2") or (event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_2):
 		cast_ice_arrow()
 	elif event.is_action_pressed("inventory"):
 		print("Inventory input received!")

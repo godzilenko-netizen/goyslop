@@ -34,8 +34,19 @@ func _ready() -> void:
 	mouse_entered.connect(func(): hovered = true)
 	mouse_exited.connect(func(): hovered = false)
 
+	if not InputMap.has_action("highlight_items"):
+		InputMap.add_action("highlight_items")
+		var ev := InputEventKey.new()
+		ev.physical_keycode = KEY_ALT
+		InputMap.action_add_event("highlight_items", ev)
+
 	if item_label:
 		item_label.visible = false
+		item_label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+		item_label.no_depth_test = true
+		item_label.fixed_size = true
+		item_label.font_size = 14
+		item_label.outline_size = 4
 	floating_label = FloatingLabel.create(self, Vector3.UP * 0.9)
 
 	if item_instance.is_empty() and item_data:
@@ -81,13 +92,45 @@ func _process(delta: float) -> void:
 	glow.scale = Vector3(pulse, 1.0, pulse)
 	beam.scale.y = 0.96 + sin(Time.get_ticks_msec() * 0.0035) * 0.04
 
-	var show_all := Input.is_physical_key_pressed(KEY_ALT) or Input.is_key_pressed(KEY_ALT)
-	var nearby := _is_player_near()
+	# 100% надёжная проверка наведения мыши в 3D через райкаст от камеры
+	var is_mouse_over := hovered
+	var camera := get_viewport().get_camera_3d()
+	if camera and get_world_3d():
+		var vp_mouse := get_viewport().get_mouse_position()
+		var root_mouse := get_tree().root.get_mouse_position() if (get_tree() and get_tree().root) else vp_mouse
+		for mouse_pos in [vp_mouse, root_mouse]:
+			var ray_origin := camera.project_ray_origin(mouse_pos)
+			var ray_direction := camera.project_ray_normal(mouse_pos)
+			var query := PhysicsRayQueryParameters3D.create(
+				ray_origin, ray_origin + ray_direction * 200.0
+			)
+			query.collide_with_areas = true
+			query.collide_with_bodies = false
+			var hit := get_world_3d().direct_space_state.intersect_ray(query)
+			if not hit.is_empty() and hit.get("collider") == self:
+				is_mouse_over = true
+				break
+
+	var show_all := (
+		Input.is_action_pressed("highlight_items") or
+		Input.is_physical_key_pressed(KEY_ALT) or
+		Input.is_key_pressed(KEY_ALT) or
+		Input.is_key_pressed(KEY_META)
+	)
+	var is_visible_state := show_all or is_mouse_over or Time.get_ticks_msec() < label_message_until
+	if item_label:
+		item_label.visible = is_visible_state
 	if floating_label:
-		floating_label.manual_visibility = show_all or (hovered and nearby) or Time.get_ticks_msec() < label_message_until
+		floating_label.manual_visibility = is_visible_state
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and (event.keycode == KEY_ALT or event.physical_keycode == KEY_ALT):
+		pass
 
 
 func _input_event(_camera: Node, event: InputEvent, _event_position: Vector3, _normal: Vector3, _shape_idx: int) -> void:
+	hovered = true
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		get_viewport().set_input_as_handled()
 		try_pickup()
@@ -105,6 +148,8 @@ func try_pickup() -> bool:
 		pickup_in_progress = true
 		input_ray_pickable = false
 		monitorable = false
+		if item_label and is_instance_valid(item_label):
+			item_label.visible = false
 		if floating_label and is_instance_valid(floating_label):
 			floating_label.queue_free()
 		queue_free()
@@ -118,31 +163,30 @@ func _is_player_near() -> bool:
 
 
 func _configure_item_label() -> void:
-	if not floating_label:
-		return
-	if item_instance.is_empty():
-		floating_label.text = "Неизвестный предмет"
-		return
-	var size: Vector2i = item_instance.get("grid_size", Vector2i.ONE)
-	var rarity: String = {
+	var name_str := str(item_instance.get("name", "Предмет")) if not item_instance.is_empty() else "Неизвестный предмет"
+	var rarity_str: String = {
 		"common": "Обычный",
 		"magic": "Магический",
 		"rare": "Редкий",
 		"unique": "Уникальный",
 	}.get(str(item_instance.get("rarity", "common")), "Обычный")
-	floating_label.text = "%s\n%s · %d×%d · ЛКМ" % [
-		str(item_instance.get("name", "Предмет")), rarity, size.x, size.y
-	]
-	floating_label.modulate = Color(0.92, 0.92, 0.94, 1.0)
+
+	var label_text := "%s\n%s · ЛКМ" % [name_str, rarity_str]
+	if item_label:
+		item_label.text = label_text
+	if floating_label:
+		floating_label.text = label_text
+		floating_label.modulate = Color(0.92, 0.92, 0.94, 1.0)
 
 
 func _show_temporary_message(message: String, color: Color) -> void:
+	if item_label:
+		item_label.text = message
 	if floating_label:
 		floating_label.text = message
 		floating_label.modulate = color
-		floating_label.manual_visibility = true
-		label_message_until = Time.get_ticks_msec() + 1000
-		get_tree().create_timer(1.0).timeout.connect(_restore_label)
+	label_message_until = Time.get_ticks_msec() + 1000
+	get_tree().create_timer(1.0).timeout.connect(_restore_label)
 
 
 func _restore_label() -> void:
