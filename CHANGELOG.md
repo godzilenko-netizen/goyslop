@@ -3,6 +3,10 @@
 ## [Unreleased]
 Полное русское описание работ за день: [`ИЗМЕНЕНИЯ_2026-08-06.md`](./ИЗМЕНЕНИЯ_2026-08-06.md).
 
+### Tools
+- Replaced machine-specific AI icon extraction scripts with a portable Godot icon pipeline that detects PNG, WebP, and JPEG by byte signature, repairs files with incorrect extensions or junk prefixes, supports crop/fit/padding/batch manifests, and always emits import-safe RGBA PNG files.
+- Cleaned the three skill icons so their artwork keeps its dark background without duplicating the in-game slot frame.
+
 ### Architecture
 - Added data-driven `SkillData` resources for basic attack, Fireball, and Ice Arrow; HUD and projectile behavior now use the same values.
 - Added `PlayerStats` and reusable `HealthComponent` nodes with signals for gameplay/UI synchronization.

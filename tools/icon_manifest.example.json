@@ -1,0 +1,20 @@
+{
+  "defaults": {
+    "size": 128,
+    "padding": 0,
+    "mode": "cover",
+    "filter": "nearest",
+    "background": "#00000000"
+  },
+  "items": [
+    {
+      "input": "res://incoming_icons/fireball.ai-output",
+      "output": "res://textures/skills/fireball.png"
+    },
+    {
+      "input": "res://incoming_icons/ice-arrow.webp",
+      "output": "res://textures/skills/ice_arrow.png",
+      "crop": [32, 24, 960, 960]
+    }
+  ]
+}
