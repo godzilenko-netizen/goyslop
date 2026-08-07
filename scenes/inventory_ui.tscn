@@ -133,7 +133,7 @@ corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
 [node name="InventoryUI" type="CanvasLayer"]
-layer = 10
+layer = 12
 process_mode = 3
 script = ExtResource("1_script")
 

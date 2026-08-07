@@ -170,6 +170,7 @@ func _make_grid_style() -> StyleBoxFlat:
 func _apply_gothic_inventory_style() -> void:
 	root_panel.theme = GOTHIC_THEME
 	root_panel.clip_contents = true
+	root_panel.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 	root_panel.add_theme_stylebox_override("panel", GothicUI.panel_style(Color(0, 0, 0, 0), Color(0, 0, 0, 0), 0))
 	var backdrop := root_panel.get_node_or_null("InventoryBackdrop") as TextureRect
 	if not backdrop:
@@ -209,10 +210,12 @@ func _apply_gothic_inventory_style() -> void:
 		"InnerBorder/OM/VBox/GridTitleBar/GridTitleText",
 	]:
 		var title := root_panel.get_node(title_path) as Label
-		title.add_theme_color_override("font_color", GothicUI.BRASS_LIGHT)
-		title.add_theme_color_override("font_outline_color", GothicUI.INK)
-		title.add_theme_constant_override("outline_size", 4)
-		title.add_theme_font_size_override("font_size", 14)
+		if title:
+			title.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+			title.add_theme_color_override("font_color", GothicUI.BRASS_LIGHT)
+			title.add_theme_color_override("font_outline_color", GothicUI.INK)
+			title.add_theme_constant_override("outline_size", 4)
+			title.add_theme_font_size_override("font_size", 14)
 
 	for key in EQUIPMENT_PATHS:
 		var slot := get_node(str(EQUIPMENT_PATHS[key][0])) as PanelContainer
@@ -225,17 +228,31 @@ func _apply_gothic_inventory_style() -> void:
 			placeholder.add_theme_constant_override("outline_size", 3)
 
 
+func _is_my_slot(slot: InventorySlot) -> bool:
+	return grid_slots.has(slot) or equipment_slots.values().has(slot)
+
+
 func _transfer_item(source: InventorySlot, target: InventorySlot) -> void:
-	if source == target:
+	if source == target or not inventory_model:
 		return
-	inventory_model.transfer(_slot_ref(source), _slot_ref(target))
 	_clear_drag_highlights()
+	if _is_my_slot(source) and _is_my_slot(target):
+		inventory_model.transfer(_slot_ref(source), _slot_ref(target))
+	else:
+		var chest_ui = get_tree().root.get_node_or_null("ChestUI")
+		if chest_ui and chest_ui.is_open and chest_ui.has_method("_transfer_item"):
+			chest_ui._transfer_item(source, target)
 
 
-func _can_drop_on_slot(source: InventorySlot, target: InventorySlot, _item: Dictionary) -> bool:
+func _can_drop_on_slot(source: InventorySlot, target: InventorySlot, dragged_item: Dictionary) -> bool:
 	if not inventory_model or source == target:
 		return false
-	return inventory_model.can_transfer(_slot_ref(source), _slot_ref(target))
+	if _is_my_slot(source) and _is_my_slot(target):
+		return inventory_model.can_transfer(_slot_ref(source), _slot_ref(target))
+	elif not _is_my_slot(source) and _is_my_slot(target):
+		var target_ref := _slot_ref(target)
+		return inventory_model.can_accept(target_ref, dragged_item)
+	return false
 
 
 func _show_drag_destination(source: InventorySlot, target: InventorySlot, dragged_item: Dictionary) -> void:
@@ -323,6 +340,13 @@ func _drop_item_to_world(source: InventorySlot, _dragged_item: Dictionary) -> vo
 func _activate_item(slot: InventorySlot) -> void:
 	if slot.item.is_empty():
 		return
+	var chest_ui = get_tree().root.get_node_or_null("ChestUI")
+	if chest_ui and chest_ui.get("is_open") and chest_ui.get("chest_model"):
+		var c_model = chest_ui.chest_model
+		if c_model and c_model.add_item(slot.item):
+			inventory_model.remove_item(_slot_ref(slot))
+			return
+
 	var effect := str(slot.item.get("effect", ""))
 	if effect in ["health", "mana"]:
 		_use_consumable(slot, effect)

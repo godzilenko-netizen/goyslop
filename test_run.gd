@@ -125,6 +125,27 @@ func _run() -> void:
 			inventory._close()
 			_check(Input.mouse_mode == Input.MOUSE_MODE_VISIBLE, "Closing inventory must keep the gameplay cursor visible")
 
+		# Тестирование сундука 13x13
+		var chest := world.get_node_or_null("GothicTestArena/GothicChest") as GothicChest
+		_check(chest != null, "GothicChest node must exist in GothicTestArena")
+		if chest:
+			_check(chest.inventory_model != null, "Chest must have an InventoryModel")
+			_check(chest.inventory_model.capacity == 169, "Chest capacity must be 13x13 (169)")
+			_check(chest.inventory_model.columns == 13, "Chest must have 13 columns")
+			chest.open_chest()
+			await process_frame
+			_check(chest.is_open, "Chest state must be open")
+			var chest_ui = scene.find_child("ChestUI", true, false) as ChestUI
+			_check(chest_ui != null, "ChestUI must exist when chest opens")
+			_check(inventory != null and inventory.is_open, "Opening chest must open player inventory")
+			if chest_ui and inventory:
+				var chest_right: float = chest_ui.root_panel.global_position.x + chest_ui.root_panel.size.x
+				var inv_left: float = inventory.root_panel.global_position.x
+				_check(chest_right < inv_left, "Chest UI (left) and Inventory UI (right) must not overlap")
+			chest.close_chest()
+			await process_frame
+			_check(not chest.is_open, "Chest state must be closed")
+
 		_check(Input.mouse_mode == Input.MOUSE_MODE_VISIBLE, "Gameplay cursor must remain visible")
 		var original_pivot_rotation: Vector3 = player.camera_pivot.rotation
 		var original_arm_rotation: Vector3 = player.spring_arm.rotation

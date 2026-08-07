@@ -2,6 +2,7 @@ extends Area3D
 class_name WorldItemDrop
 
 const ItemDataType = preload("res://scripts/data/item_data.gd")
+const FloatingLabel = preload("res://scripts/ui/floating_label.gd")
 
 @export var item_data: ItemDataType
 @export var pickup_range: float = 3.0
@@ -23,12 +24,20 @@ var item_instance: Dictionary = {}
 var pickup_in_progress := false
 
 
+var floating_label: FloatingLabel = null
+
+
 func _ready() -> void:
 	add_to_group("WorldLoot")
 	input_ray_pickable = true
 	player = get_tree().get_first_node_in_group("Player") as Node3D
 	mouse_entered.connect(func(): hovered = true)
 	mouse_exited.connect(func(): hovered = false)
+
+	if item_label:
+		item_label.visible = false
+	floating_label = FloatingLabel.create(self, Vector3.UP * 0.9)
+
 	if item_instance.is_empty() and item_data:
 		item_instance = item_data.to_inventory_item()
 	_configure_item_label()
@@ -74,7 +83,8 @@ func _process(delta: float) -> void:
 
 	var show_all := Input.is_physical_key_pressed(KEY_ALT) or Input.is_key_pressed(KEY_ALT)
 	var nearby := _is_player_near()
-	item_label.visible = show_all or (hovered and nearby) or Time.get_ticks_msec() < label_message_until
+	if floating_label:
+		floating_label.manual_visibility = show_all or (hovered and nearby) or Time.get_ticks_msec() < label_message_until
 
 
 func _input_event(_camera: Node, event: InputEvent, _event_position: Vector3, _normal: Vector3, _shape_idx: int) -> void:
@@ -95,6 +105,8 @@ func try_pickup() -> bool:
 		pickup_in_progress = true
 		input_ray_pickable = false
 		monitorable = false
+		if floating_label and is_instance_valid(floating_label):
+			floating_label.queue_free()
 		queue_free()
 	else:
 		_show_temporary_message("ИНВЕНТАРЬ ЗАПОЛНЕН", Color(1.0, 0.28, 0.18))
@@ -106,8 +118,10 @@ func _is_player_near() -> bool:
 
 
 func _configure_item_label() -> void:
+	if not floating_label:
+		return
 	if item_instance.is_empty():
-		item_label.text = "Неизвестный предмет"
+		floating_label.text = "Неизвестный предмет"
 		return
 	var size: Vector2i = item_instance.get("grid_size", Vector2i.ONE)
 	var rarity: String = {
@@ -116,18 +130,19 @@ func _configure_item_label() -> void:
 		"rare": "Редкий",
 		"unique": "Уникальный",
 	}.get(str(item_instance.get("rarity", "common")), "Обычный")
-	item_label.text = "%s\n%s · %d×%d · ЛКМ" % [
+	floating_label.text = "%s\n%s · %d×%d · ЛКМ" % [
 		str(item_instance.get("name", "Предмет")), rarity, size.x, size.y
 	]
-	item_label.modulate = Color(0.78, 0.78, 0.80, 1.0)
+	floating_label.modulate = Color(0.92, 0.92, 0.94, 1.0)
 
 
 func _show_temporary_message(message: String, color: Color) -> void:
-	item_label.text = message
-	item_label.modulate = color
-	item_label.visible = true
-	label_message_until = Time.get_ticks_msec() + 1000
-	get_tree().create_timer(1.0).timeout.connect(_restore_label)
+	if floating_label:
+		floating_label.text = message
+		floating_label.modulate = color
+		floating_label.manual_visibility = true
+		label_message_until = Time.get_ticks_msec() + 1000
+		get_tree().create_timer(1.0).timeout.connect(_restore_label)
 
 
 func _restore_label() -> void:

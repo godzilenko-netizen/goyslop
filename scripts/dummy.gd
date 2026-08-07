@@ -1,5 +1,7 @@
 extends StaticBody3D
 
+const FloatingLabel = preload("res://scripts/ui/floating_label.gd")
+
 @export var max_hp: int = 9999
 var current_hp: int = 9999
 
@@ -14,9 +16,19 @@ var burn_material: StandardMaterial3D
 var is_frozen: bool = false
 var is_burning: bool = false
 
+var floating_label: FloatingLabel = null
+
 func _ready() -> void:
 	add_to_group("Enemies")
 	current_hp = max_hp
+	if hp_label:
+		hp_label.fixed_size = false
+		hp_label.pixel_size = 0.0045
+		hp_label.no_depth_test = true
+		hp_label.render_priority = 10
+		hp_label.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
+		hp_label.font_size = 64
+		hp_label.outline_size = 8
 	
 	# Настройка базового оранжевого материала манекена
 	original_material = StandardMaterial3D.new()

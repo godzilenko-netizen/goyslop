@@ -28,11 +28,13 @@ material_override = SubResource("Material_dummy")
 
 [node name="HPLabel3D" type="Label3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+pixel_size = 0.0045
 billboard = 1
 double_sided = false
 no_depth_test = true
-texture_filter = 1
+render_priority = 10
+texture_filter = 4
 text = "Манекен
 9999 / 9999"
-font_size = 28
-outline_size = 6
+font_size = 64
+outline_size = 8

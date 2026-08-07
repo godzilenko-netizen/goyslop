@@ -1,0 +1,76 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/chest_ui.gd" id="1_chest_ui_script"]
+[ext_resource type="Theme" path="res://themes/diablo2_theme.tres" id="2_theme"]
+
+[node name="ChestUI" type="CanvasLayer"]
+layer = 15
+script = ExtResource("1_chest_ui_script")
+
+[node name="RootPanel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+theme = ExtResource("2_theme")
+offset_right = 520.0
+offset_bottom = 600.0
+
+[node name="InnerBorder" type="PanelContainer" parent="RootPanel"]
+layout_mode = 2
+
+[node name="OM" type="MarginContainer" parent="RootPanel/InnerBorder"]
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="RootPanel/InnerBorder/OM"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TitleBar" type="HBoxContainer" parent="RootPanel/InnerBorder/OM/VBox"]
+layout_mode = 2
+
+[node name="TitleText" type="Label" parent="RootPanel/InnerBorder/OM/VBox/TitleBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "СУНДУК (13×13)"
+horizontal_alignment = 1
+
+[node name="CloseBtn" type="Button" parent="RootPanel/InnerBorder/OM/VBox/TitleBar"]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+text = "✕"
+
+[node name="Sep1" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox"]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+
+[node name="GridCard" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Margin" type="MarginContainer" parent="RootPanel/InnerBorder/OM/VBox/GridCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="GridRoot" type="Control" parent="RootPanel/InnerBorder/OM/VBox/GridCard/Margin"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Footer" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox"]
+layout_mode = 2
+
+[node name="FM" type="MarginContainer" parent="RootPanel/InnerBorder/OM/VBox/Footer"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 6
+
+[node name="FHBox" type="HBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/Footer/FM"]
+layout_mode = 2
+alignment = 1
+
+[node name="SortBtn" type="Button" parent="RootPanel/InnerBorder/OM/VBox/Footer/FM/FHBox"]
+custom_minimum_size = Vector2(140, 28)
+layout_mode = 2
+text = "СОРТИРОВКА"

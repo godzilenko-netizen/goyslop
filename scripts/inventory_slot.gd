@@ -77,6 +77,7 @@ func _ensure_item_visuals() -> void:
 	if not _item_label:
 		_item_label = Label.new()
 		_item_label.name = "ItemLabel"
+		_item_label.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 		_item_label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		_item_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		_item_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -86,11 +87,14 @@ func _ensure_item_visuals() -> void:
 		_item_label.add_theme_constant_override("outline_size", 4)
 		_item_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(_item_label)
+	else:
+		_item_label.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 
 	_quantity_label = get_node_or_null("QuantityLabel") as Label
 	if not _quantity_label:
 		_quantity_label = Label.new()
 		_quantity_label.name = "QuantityLabel"
+		_quantity_label.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 		_quantity_label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		_quantity_label.offset_right = -5.0
 		_quantity_label.offset_bottom = -3.0
@@ -102,6 +106,11 @@ func _ensure_item_visuals() -> void:
 		_quantity_label.add_theme_constant_override("outline_size", 4)
 		_quantity_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(_quantity_label)
+	else:
+		_quantity_label.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+
+	if _placeholder_label:
+		_placeholder_label.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 
 
 func _refresh() -> void:
@@ -119,8 +128,17 @@ func _refresh() -> void:
 
 	var quantity := int(item.get("quantity", 1))
 	var icon_path := str(item.get("icon", ""))
-	if not icon_path.is_empty() and ResourceLoader.exists(icon_path):
-		_item_icon.texture = load(icon_path) as Texture2D
+	if not icon_path.is_empty():
+		var tex: Texture2D = null
+		if ResourceLoader.exists(icon_path):
+			tex = load(icon_path) as Texture2D
+		if not tex:
+			var global_p := ProjectSettings.globalize_path(icon_path)
+			if FileAccess.file_exists(global_p):
+				var img := Image.load_from_file(global_p)
+				if img:
+					tex = ImageTexture.create_from_image(img)
+		_item_icon.texture = tex
 		_item_icon.visible = _item_icon.texture != null
 	else:
 		_item_icon.texture = null

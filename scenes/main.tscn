@@ -106,25 +106,4 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1, -3)
 [node name="Troll" parent="SubViewportContainer/SubViewport/World" instance=ExtResource("3_troll_scene")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 4)
 
-[node name="Pickup_H1" parent="SubViewportContainer/SubViewport/World" instance=ExtResource("4_pickup")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 1, -2)
-
-[node name="Pickup_H2" parent="SubViewportContainer/SubViewport/World" instance=ExtResource("4_pickup")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 1, 5)
-
-[node name="Pickup_H3" parent="SubViewportContainer/SubViewport/World" instance=ExtResource("4_pickup")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -8)
-
-[node name="Pickup_M1" parent="SubViewportContainer/SubViewport/World" instance=ExtResource("4_pickup")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 1, -1)
-type = "Mana"
-
-[node name="Pickup_M2" parent="SubViewportContainer/SubViewport/World" instance=ExtResource("4_pickup")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 1, 6)
-type = "Mana"
-
-[node name="Pickup_M3" parent="SubViewportContainer/SubViewport/World" instance=ExtResource("4_pickup")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1, 8)
-type = "Mana"
-
 [node name="PauseMenu" parent="." instance=ExtResource("5_pause_menu")]

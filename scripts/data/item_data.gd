@@ -10,9 +10,11 @@ extends Resource
 @export var armor: int = 0
 @export var max_stack: int = 1
 @export var icon: Texture2D
+@export var icon_path: String = ""
 
 
 func to_inventory_item(quantity: int = 1) -> Dictionary:
+	var path_str := icon_path if not icon_path.is_empty() else (icon.resource_path if icon else "")
 	return {
 		"id": item_id,
 		"name": display_name,
@@ -23,7 +25,7 @@ func to_inventory_item(quantity: int = 1) -> Dictionary:
 		"armor": armor,
 		"quantity": maxi(quantity, 1),
 		"max_stack": maxi(max_stack, 1),
-		"icon": icon.resource_path if icon else "",
+		"icon": path_str,
 	}
 
 

@@ -8,6 +8,7 @@ const RefillableFlaskType = preload("res://scripts/components/refillable_flask.g
 const PlayerStatsType = preload("res://scripts/components/player_stats.gd")
 const GameHUDType = preload("res://scripts/hud.gd")
 const RetroMaterialStylerType = preload("res://scripts/retro_material_styler.gd")
+const FloatingLabel = preload("res://scripts/ui/floating_label.gd")
 const BASIC_ATTACK_SKILL = preload("res://data/skills/basic_attack.tres")
 const FIREBALL_SKILL = preload("res://data/skills/fireball.tres")
 const ICE_ARROW_SKILL = preload("res://data/skills/ice_arrow.tres")
@@ -605,21 +606,32 @@ func _cast_projectile_skill(skill: SkillDataType) -> void:
 	print(skill.display_name, " launched")
 	is_casting = false
 
+var floating_mana_warning: FloatingLabel = null
+
 func _show_mana_warning() -> void:
-	if not mana_warning:
-		return
+	if mana_warning:
+		mana_warning.visible = false
+	if not floating_mana_warning or not is_instance_valid(floating_mana_warning):
+		floating_mana_warning = FloatingLabel.create(self, Vector3.UP * 2.35)
+		floating_mana_warning.add_theme_color_override("font_color", Color(1.0, 0.22, 0.12))
+		floating_mana_warning.add_theme_color_override("font_outline_color", Color(0.18, 0.01, 0, 0.95))
+		floating_mana_warning.text = "НЕДОСТАТОЧНО МАНЫ"
+
 	if _mana_warning_tween and _mana_warning_tween.is_valid():
 		_mana_warning_tween.kill()
 
-	mana_warning.position = Vector3(0.0, 2.35, 0.0)
-	mana_warning.modulate = Color(1.0, 0.22, 0.12, 1.0)
-	mana_warning.visible = true
+	floating_mana_warning.offset_3d = Vector3(0.0, 2.35, 0.0)
+	floating_mana_warning.modulate = Color(1.0, 0.22, 0.12, 1.0)
+	floating_mana_warning.manual_visibility = true
 
 	_mana_warning_tween = create_tween().set_parallel(true)
 	_mana_warning_tween.tween_property(
-		mana_warning, "position", Vector3(0.0, 2.75, 0.0), 1.05
+		floating_mana_warning, "offset_3d", Vector3(0.0, 2.75, 0.0), 1.05
 	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	_mana_warning_tween.tween_property(
-		mana_warning, "modulate:a", 0.0, 0.65
+		floating_mana_warning, "modulate:a", 0.0, 0.65
 	).set_delay(0.35).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	_mana_warning_tween.chain().tween_callback(func(): mana_warning.visible = false)
+	_mana_warning_tween.chain().tween_callback(func():
+		if floating_mana_warning:
+			floating_mana_warning.manual_visibility = false
+	)
