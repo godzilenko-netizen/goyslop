@@ -1,0 +1,108 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://scripts/environment/gothic_brazier.gd" id="1_script"]
+[ext_resource type="Material" path="res://materials/gothic_iron.tres" id="2_iron"]
+
+[sub_resource type="StandardMaterial3D" id="Mat_coal"]
+albedo_color = Color(0.24, 0.045, 0.012, 1)
+roughness = 0.78
+emission_enabled = true
+emission = Color(0.65, 0.09, 0.015, 1)
+emission_energy_multiplier = 1.3
+
+[sub_resource type="StandardMaterial3D" id="Mat_flame_outer"]
+shading_mode = 0
+albedo_color = Color(0.98, 0.28, 0.035, 1)
+emission_enabled = true
+emission = Color(1, 0.18, 0.015, 1)
+emission_energy_multiplier = 2.8
+
+[sub_resource type="StandardMaterial3D" id="Mat_flame_core"]
+shading_mode = 0
+albedo_color = Color(1, 0.84, 0.24, 1)
+emission_enabled = true
+emission = Color(1, 0.58, 0.06, 1)
+emission_energy_multiplier = 3.4
+
+[sub_resource type="CylinderMesh" id="Mesh_stand"]
+material = ExtResource("2_iron")
+top_radius = 0.16
+bottom_radius = 0.28
+height = 0.82
+radial_segments = 8
+
+[sub_resource type="CylinderMesh" id="Mesh_bowl"]
+material = ExtResource("2_iron")
+top_radius = 0.62
+bottom_radius = 0.38
+height = 0.28
+radial_segments = 8
+
+[sub_resource type="CylinderMesh" id="Mesh_coals"]
+material = SubResource("Mat_coal")
+top_radius = 0.47
+bottom_radius = 0.47
+height = 0.08
+radial_segments = 8
+
+[sub_resource type="CylinderMesh" id="Mesh_flame_outer"]
+material = SubResource("Mat_flame_outer")
+top_radius = 0.0
+bottom_radius = 0.24
+height = 0.72
+radial_segments = 6
+rings = 1
+
+[sub_resource type="CylinderMesh" id="Mesh_flame_core"]
+material = SubResource("Mat_flame_core")
+top_radius = 0.0
+bottom_radius = 0.14
+height = 0.46
+radial_segments = 6
+rings = 1
+
+[sub_resource type="CylinderShape3D" id="Shape_brazier"]
+radius = 0.58
+height = 1.1
+
+[node name="GothicBrazier" type="StaticBody3D"]
+collision_layer = 1
+collision_mask = 1
+script = ExtResource("1_script")
+
+[node name="Stand" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.41, 0)
+mesh = SubResource("Mesh_stand")
+
+[node name="Bowl" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.88, 0)
+mesh = SubResource("Mesh_bowl")
+
+[node name="Coals" type="MeshInstance3D" parent="."]
+position = Vector3(0, 1.04, 0)
+mesh = SubResource("Mesh_coals")
+
+[node name="FlameRoot" type="Node3D" parent="."]
+position = Vector3(0, 1.12, 0)
+
+[node name="OuterFlame" type="MeshInstance3D" parent="FlameRoot"]
+position = Vector3(-0.05, 0.34, 0.01)
+rotation = Vector3(0.08, 0, -0.18)
+mesh = SubResource("Mesh_flame_outer")
+
+[node name="CoreFlame" type="MeshInstance3D" parent="FlameRoot"]
+position = Vector3(0.07, 0.24, -0.03)
+rotation = Vector3(-0.1, 0, 0.2)
+mesh = SubResource("Mesh_flame_core")
+
+[node name="FireLight" type="OmniLight3D" parent="."]
+position = Vector3(0, 1.55, 0)
+light_color = Color(1, 0.46, 0.14, 1)
+light_energy = 2.15
+shadow_enabled = true
+omni_range = 6.5
+omni_attenuation = 1.35
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0.55, 0)
+shape = SubResource("Shape_brazier")

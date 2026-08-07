@@ -1,8 +1,9 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="Script" path="res://scripts/inventory_ui.gd" id="1_script"]
 [ext_resource type="Script" path="res://scripts/inventory_slot.gd" id="2_slot"]
 [ext_resource type="Theme" path="res://themes/diablo2_theme.tres" id="3_theme"]
+[ext_resource type="Script" path="res://scripts/inventory_drop_zone.gd" id="4_drop_zone"]
 
 [sub_resource type="StyleBoxFlat" id="SB_outer"]
 bg_color = Color(0.10, 0.085, 0.062, 0.99)
@@ -135,6 +136,17 @@ corner_radius_bottom_left = 4
 layer = 10
 process_mode = 3
 script = ExtResource("1_script")
+
+[node name="WorldDropZone" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+script = ExtResource("4_drop_zone")
 
 [node name="RootPanel" type="PanelContainer" parent="."]
 unique_name_in_owner = true
@@ -451,9 +463,8 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="GridRoot" type="GridContainer" parent="RootPanel/InnerBorder/OM/VBox/GridCard/GridMargin"]
+[node name="GridRoot" type="Control" parent="RootPanel/InnerBorder/OM/VBox/GridCard/GridMargin"]
 unique_name_in_owner = true
-columns = 10
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4

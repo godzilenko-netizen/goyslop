@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="FlaskData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/flask_data.gd" id="1_data"]
+[ext_resource type="Texture2D" path="res://assets/ui/basic_flask_full.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_data")
+flask_id = &"health"
+display_name = "Малая колба здоровья"
+resource_type = "health"
+icon = ExtResource("2_icon")
+liquid_tint = Color(0.95, 0.075, 0.045, 1)
+max_charges = 3
+restore_amount = 35
+recharge_seconds = 8.0
+input_action = &"health_flask"
+hotkey_label = "Z"

@@ -29,6 +29,35 @@ func _init() -> void:
 	restored.load_state(equipment_model.serialize())
 	_check(restored.serialize() == equipment_model.serialize(), "Serialized inventory must round-trip")
 
+	var sized_model = InventoryModelType.new(12, {"armor": "armor"}, 4)
+	var leather_armor := {
+		"id": "leather_armor",
+		"name": "Leather Armor",
+		"slot": "armor",
+		"grid_size": Vector2i(2, 3),
+	}
+	_check(sized_model.add_item(leather_armor), "2x3 armor must fit into a 4x3 grid")
+	_check(sized_model.get_anchor_index(0) == 0, "Large item must keep an anchor cell")
+	for occupied_cell in [0, 1, 4, 5, 8, 9]:
+		_check(sized_model.get_anchor_index(occupied_cell) == 0, "Large item footprint must reserve every covered cell")
+	_check(not sized_model.can_place_at(3, leather_armor), "2x3 armor must not cross the right grid edge")
+	_check(sized_model.transfer(sized_model.grid_ref(0), sized_model.equipment_ref("armor")), "Large armor must equip")
+	_check(sized_model.get_anchor_index(0) == -1, "Equipping must release the full 2x3 footprint")
+	_check(sized_model.transfer(sized_model.equipment_ref("armor"), sized_model.grid_ref(2)), "Large armor must return to another valid 2x3 position")
+	_check(sized_model.get_anchor_index(10) == 2, "Moved large item must reserve its new footprint")
+	_check(not sized_model.can_transfer(sized_model.grid_ref(2), sized_model.grid_ref(3)), "Transfer preview must reject an item crossing the grid edge")
+	var removed_armor: Dictionary = sized_model.remove_item(sized_model.grid_ref(2))
+	_check(str(removed_armor.get("id", "")) == "leather_armor", "Removing a large item must return its data")
+	_check(sized_model.get_anchor_index(10) == -1, "Removing a large item must release its full footprint")
+
+	var duplicate_model = InventoryModelType.new(60, {"armor": "armor"}, 10)
+	var non_stackable_armor := leather_armor.duplicate(true)
+	non_stackable_armor["max_stack"] = 1
+	_check(duplicate_model.add_item(non_stackable_armor), "First non-stackable armor must fit")
+	_check(duplicate_model.add_item(non_stackable_armor), "Second identical non-stackable armor must also fit")
+	_check(duplicate_model.get_anchor_index(0) == 0, "First identical armor must keep its own anchor")
+	_check(duplicate_model.get_anchor_index(2) == 2, "Second identical armor must use a separate anchor")
+
 	if failures.is_empty():
 		print("TEST PASSED: transactional inventory model and equipment")
 		quit(0)

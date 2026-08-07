@@ -18,7 +18,7 @@ shape = SubResource("SphereShape3D_col")
 [node name="Visuals" type="Node3D" parent="."]
 
 [node name="Trail" type="GPUParticles3D" parent="."]
-amount = 96
+amount = 32
 lifetime = 0.65
 one_shot = false
 explosiveness = 0.0
@@ -27,7 +27,7 @@ local_coords = false
 draw_order = 1
 
 [node name="DetailTrail" type="GPUParticles3D" parent="."]
-amount = 36
+amount = 14
 lifetime = 0.8
 one_shot = false
 explosiveness = 0.0

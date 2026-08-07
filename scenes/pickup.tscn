@@ -6,8 +6,10 @@
 radius = 0.5
 
 [sub_resource type="SphereMesh" id="SphereMesh_1"]
-radius = 0.3
-height = 0.6
+radius = 0.24
+height = 0.5
+radial_segments = 8
+rings = 4
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
 emission_enabled = true
@@ -47,7 +49,7 @@ mesh = SubResource("SphereMesh_1")
 surface_material_override/0 = SubResource("StandardMaterial3D_1")
 
 [node name="Particles" type="GPUParticles3D" parent="."]
-amount = 16
+amount = 8
 lifetime = 1.0
 process_material = SubResource("ParticleProcessMaterial_1")
 draw_pass_1 = SubResource("QuadMesh_1")

@@ -1,85 +1,166 @@
-[gd_resource type="Theme" load_steps=7 format=3]
+[gd_resource type="Theme" load_steps=13 format=3]
 
-[sub_resource type="StyleBoxFlat" id="SB_outer"]
-bg_color = Color(0.048, 0.040, 0.030, 0.98)
-border_width_left = 6
-border_width_top = 6
-border_width_right = 4
-border_width_bottom = 6
-border_color = Color(0.55, 0.40, 0.10, 1.0)
-corner_radius_top_left = 12
-corner_radius_bottom_left = 12
-shadow_color = Color(0.0, 0.0, 0.0, 0.90)
-shadow_size = 32
-shadow_offset = Vector2(-8, 0)
+[sub_resource type="SystemFont" id="Font_gothic"]
+font_names = PackedStringArray("Georgia", "Times New Roman")
+font_weight = 500
 
-[sub_resource type="StyleBoxFlat" id="SB_section"]
-bg_color = Color(0.038, 0.032, 0.024, 0.95)
+[sub_resource type="StyleBoxFlat" id="SB_panel"]
+bg_color = Color(0.055, 0.040, 0.031, 0.97)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.36, 0.25, 0.10, 1)
+shadow_color = Color(0, 0, 0, 0.88)
+shadow_size = 12
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="SB_button_normal"]
+content_margin_left = 18.0
+content_margin_top = 8.0
+content_margin_right = 18.0
+content_margin_bottom = 8.0
+bg_color = Color(0.075, 0.050, 0.035, 0.96)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.38, 0.28, 0.09, 1.0)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+border_color = Color(0.30, 0.22, 0.12, 1)
 
-[sub_resource type="StyleBoxFlat" id="SB_btn_normal"]
-bg_color = Color(0.08, 0.06, 0.04, 0.95)
+[sub_resource type="StyleBoxFlat" id="SB_button_hover"]
+content_margin_left = 18.0
+content_margin_top = 8.0
+content_margin_right = 18.0
+content_margin_bottom = 8.0
+bg_color = Color(0.15, 0.075, 0.042, 0.98)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.45, 0.34, 0.10, 1.0)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
-
-[sub_resource type="StyleBoxFlat" id="SB_btn_hover"]
-bg_color = Color(0.14, 0.10, 0.06, 0.98)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.85, 0.65, 0.18, 1.0)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
-shadow_color = Color(0.85, 0.65, 0.18, 0.3)
+border_color = Color(0.73, 0.49, 0.16, 1)
+shadow_color = Color(0.72, 0.22, 0.06, 0.35)
 shadow_size = 6
 
-[sub_resource type="StyleBoxFlat" id="SB_btn_pressed"]
-bg_color = Color(0.03, 0.02, 0.01, 0.99)
+[sub_resource type="StyleBoxFlat" id="SB_button_pressed"]
+content_margin_left = 18.0
+content_margin_top = 9.0
+content_margin_right = 18.0
+content_margin_bottom = 7.0
+bg_color = Color(0.028, 0.019, 0.015, 1)
 border_width_left = 2
-border_width_top = 2
+border_width_top = 3
 border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.60, 0.44, 0.12, 1.0)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
+border_width_bottom = 1
+border_color = Color(0.46, 0.30, 0.10, 1)
 
-[sub_resource type="StyleBoxFlat" id="SB_slot_accent"]
-bg_color = Color(0.035, 0.026, 0.012, 0.97)
+[sub_resource type="StyleBoxFlat" id="SB_button_disabled"]
+content_margin_left = 18.0
+content_margin_top = 8.0
+content_margin_right = 18.0
+content_margin_bottom = 8.0
+bg_color = Color(0.04, 0.035, 0.031, 0.86)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.16, 0.14, 0.12, 1)
+
+[sub_resource type="StyleBoxEmpty" id="SB_focus"]
+
+[sub_resource type="StyleBoxFlat" id="SB_input"]
+content_margin_left = 10.0
+content_margin_top = 7.0
+content_margin_right = 10.0
+content_margin_bottom = 7.0
+bg_color = Color(0.018, 0.014, 0.012, 0.98)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.70, 0.52, 0.14, 1.0)
-corner_radius_top_left = 5
-corner_radius_top_right = 5
-corner_radius_bottom_right = 5
-corner_radius_bottom_left = 5
-shadow_color = Color(0.55, 0.40, 0.06, 0.25)
-shadow_size = 6
-shadow_offset = Vector2(0, 2)
+border_color = Color(0.29, 0.23, 0.16, 1)
+
+[sub_resource type="StyleBoxFlat" id="SB_input_focus"]
+content_margin_left = 10.0
+content_margin_top = 7.0
+content_margin_right = 10.0
+content_margin_bottom = 7.0
+bg_color = Color(0.025, 0.018, 0.014, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.70, 0.48, 0.17, 1)
+
+[sub_resource type="StyleBoxFlat" id="SB_tooltip"]
+content_margin_left = 12.0
+content_margin_top = 9.0
+content_margin_right = 12.0
+content_margin_bottom = 9.0
+bg_color = Color(0.018, 0.013, 0.011, 0.98)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.51, 0.35, 0.13, 1)
+shadow_color = Color(0, 0, 0, 0.9)
+shadow_size = 10
+
+[sub_resource type="StyleBoxLine" id="SB_separator"]
+color = Color(0.45, 0.30, 0.10, 1)
+thickness = 1
+grow_begin = 2.0
+grow_end = 2.0
+
+[sub_resource type="StyleBoxFlat" id="SB_scroll"]
+bg_color = Color(0.025, 0.020, 0.017, 1)
+
+[sub_resource type="StyleBoxFlat" id="SB_grabber"]
+bg_color = Color(0.35, 0.24, 0.10, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.65, 0.44, 0.15, 1)
 
 [resource]
-Button/styles/hover = SubResource("SB_btn_hover")
-Button/styles/normal = SubResource("SB_btn_normal")
-Button/styles/pressed = SubResource("SB_btn_pressed")
-PanelContainer/styles/panel = SubResource("SB_outer")
+default_font = SubResource("Font_gothic")
+default_font_size = 14
+default_base_scale = 1.0
+Label/colors/font_color = Color(0.82, 0.75, 0.63, 1)
+Label/colors/font_shadow_color = Color(0, 0, 0, 0.9)
+Label/constants/shadow_offset_x = 1
+Label/constants/shadow_offset_y = 2
+Button/colors/font_color = Color(0.76, 0.69, 0.57, 1)
+Button/colors/font_hover_color = Color(0.95, 0.78, 0.39, 1)
+Button/colors/font_pressed_color = Color(0.66, 0.54, 0.35, 1)
+Button/colors/font_disabled_color = Color(0.30, 0.28, 0.25, 1)
+Button/colors/font_outline_color = Color(0.02, 0.015, 0.01, 1)
+Button/constants/outline_size = 3
+Button/font_sizes/font_size = 16
+Button/styles/normal = SubResource("SB_button_normal")
+Button/styles/hover = SubResource("SB_button_hover")
+Button/styles/pressed = SubResource("SB_button_pressed")
+Button/styles/disabled = SubResource("SB_button_disabled")
+Button/styles/focus = SubResource("SB_focus")
+Panel/styles/panel = SubResource("SB_panel")
+PanelContainer/styles/panel = SubResource("SB_panel")
+LineEdit/colors/font_color = Color(0.86, 0.79, 0.68, 1)
+LineEdit/colors/font_placeholder_color = Color(0.42, 0.38, 0.33, 1)
+LineEdit/colors/caret_color = Color(0.90, 0.65, 0.25, 1)
+LineEdit/styles/normal = SubResource("SB_input")
+LineEdit/styles/focus = SubResource("SB_input_focus")
+OptionButton/colors/font_color = Color(0.80, 0.72, 0.60, 1)
+OptionButton/styles/normal = SubResource("SB_button_normal")
+OptionButton/styles/hover = SubResource("SB_button_hover")
+OptionButton/styles/pressed = SubResource("SB_button_pressed")
+OptionButton/styles/focus = SubResource("SB_focus")
+CheckBox/colors/font_color = Color(0.76, 0.69, 0.57, 1)
+CheckBox/colors/font_hover_color = Color(0.95, 0.78, 0.39, 1)
+TooltipPanel/styles/panel = SubResource("SB_tooltip")
+TooltipLabel/colors/font_color = Color(0.86, 0.79, 0.67, 1)
+TooltipLabel/font_sizes/font_size = 12
+HSeparator/styles/separator = SubResource("SB_separator")
+VSeparator/styles/separator = SubResource("SB_separator")
+VScrollBar/styles/scroll = SubResource("SB_scroll")
+VScrollBar/styles/grabber = SubResource("SB_grabber")
+VScrollBar/styles/grabber_highlight = SubResource("SB_grabber")
