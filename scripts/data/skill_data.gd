@@ -5,6 +5,7 @@ extends Resource
 @export var display_name: String
 @export_multiline var description: String
 @export var hotbar_slot: int = 1
+@export var icon: Texture2D
 
 @export_group("Combat")
 @export var damage: int = 0

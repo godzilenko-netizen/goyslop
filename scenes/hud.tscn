@@ -1,7 +1,10 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://scripts/hud.gd" id="1_hud_gd"]
 [ext_resource type="Theme" path="res://themes/diablo2_theme.tres" id="2_theme"]
+[ext_resource type="Texture2D" path="res://textures/skills/fist_attack.png" id="3_fist_icon"]
+[ext_resource type="Texture2D" path="res://textures/skills/fireball.png" id="4_fireball_icon"]
+[ext_resource type="Texture2D" path="res://textures/skills/ice_arrow.png" id="5_ice_arrow_icon"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xp_panel"]
 bg_color = Color(0.048, 0.040, 0.030, 0.98)
@@ -253,7 +256,9 @@ clip_contents = true
 theme_override_styles/panel = SubResource("StyleBoxFlat_slot_bg")
 
 [node name="FistIcon" type="TextureRect" parent="Control/BottomCenterPanel/HotbarContainer/Slot1"]
+custom_minimum_size = Vector2(46, 46)
 layout_mode = 2
+texture = ExtResource("3_fist_icon")
 expand_mode = 1
 stretch_mode = 6
 
@@ -279,7 +284,9 @@ clip_contents = true
 theme_override_styles/panel = SubResource("StyleBoxFlat_slot_bg")
 
 [node name="SkillIcon" type="TextureRect" parent="Control/BottomCenterPanel/HotbarContainer/Slot2"]
+custom_minimum_size = Vector2(46, 46)
 layout_mode = 2
+texture = ExtResource("4_fireball_icon")
 expand_mode = 1
 stretch_mode = 6
 
@@ -301,7 +308,15 @@ color = Color(0, 0, 0, 0.75)
 [node name="Slot3" type="PanelContainer" parent="Control/BottomCenterPanel/HotbarContainer"]
 custom_minimum_size = Vector2(54, 54)
 layout_mode = 2
+clip_contents = true
 theme_override_styles/panel = SubResource("StyleBoxFlat_slot_bg")
+
+[node name="SkillIcon" type="TextureRect" parent="Control/BottomCenterPanel/HotbarContainer/Slot3"]
+custom_minimum_size = Vector2(46, 46)
+layout_mode = 2
+texture = ExtResource("5_ice_arrow_icon")
+expand_mode = 1
+stretch_mode = 6
 
 [node name="SlotLabel" type="Label" parent="Control/BottomCenterPanel/HotbarContainer/Slot3"]
 layout_mode = 2
@@ -315,7 +330,14 @@ text = "3"
 [node name="Slot4" type="PanelContainer" parent="Control/BottomCenterPanel/HotbarContainer"]
 custom_minimum_size = Vector2(54, 54)
 layout_mode = 2
+clip_contents = true
 theme_override_styles/panel = SubResource("StyleBoxFlat_slot_bg")
+
+[node name="SkillIcon" type="TextureRect" parent="Control/BottomCenterPanel/HotbarContainer/Slot4"]
+custom_minimum_size = Vector2(46, 46)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 6
 
 [node name="SlotLabel" type="Label" parent="Control/BottomCenterPanel/HotbarContainer/Slot4"]
 layout_mode = 2
@@ -329,7 +351,14 @@ text = "4"
 [node name="Slot5" type="PanelContainer" parent="Control/BottomCenterPanel/HotbarContainer"]
 custom_minimum_size = Vector2(54, 54)
 layout_mode = 2
+clip_contents = true
 theme_override_styles/panel = SubResource("StyleBoxFlat_slot_bg")
+
+[node name="SkillIcon" type="TextureRect" parent="Control/BottomCenterPanel/HotbarContainer/Slot5"]
+custom_minimum_size = Vector2(46, 46)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 6
 
 [node name="SlotLabel" type="Label" parent="Control/BottomCenterPanel/HotbarContainer/Slot5"]
 layout_mode = 2
@@ -343,7 +372,14 @@ text = "5"
 [node name="Slot6" type="PanelContainer" parent="Control/BottomCenterPanel/HotbarContainer"]
 custom_minimum_size = Vector2(54, 54)
 layout_mode = 2
+clip_contents = true
 theme_override_styles/panel = SubResource("StyleBoxFlat_slot_bg")
+
+[node name="SkillIcon" type="TextureRect" parent="Control/BottomCenterPanel/HotbarContainer/Slot6"]
+custom_minimum_size = Vector2(46, 46)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 6
 
 [node name="SlotLabel" type="Label" parent="Control/BottomCenterPanel/HotbarContainer/Slot6"]
 layout_mode = 2
@@ -357,7 +393,14 @@ text = "6"
 [node name="Slot7" type="PanelContainer" parent="Control/BottomCenterPanel/HotbarContainer"]
 custom_minimum_size = Vector2(54, 54)
 layout_mode = 2
+clip_contents = true
 theme_override_styles/panel = SubResource("StyleBoxFlat_slot_bg")
+
+[node name="SkillIcon" type="TextureRect" parent="Control/BottomCenterPanel/HotbarContainer/Slot7"]
+custom_minimum_size = Vector2(46, 46)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 6
 
 [node name="SlotLabel" type="Label" parent="Control/BottomCenterPanel/HotbarContainer/Slot7"]
 layout_mode = 2
@@ -371,7 +414,14 @@ text = "7"
 [node name="Slot8" type="PanelContainer" parent="Control/BottomCenterPanel/HotbarContainer"]
 custom_minimum_size = Vector2(54, 54)
 layout_mode = 2
+clip_contents = true
 theme_override_styles/panel = SubResource("StyleBoxFlat_slot_bg")
+
+[node name="SkillIcon" type="TextureRect" parent="Control/BottomCenterPanel/HotbarContainer/Slot8"]
+custom_minimum_size = Vector2(46, 46)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 6
 
 [node name="SlotLabel" type="Label" parent="Control/BottomCenterPanel/HotbarContainer/Slot8"]
 layout_mode = 2
