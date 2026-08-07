@@ -58,6 +58,11 @@ func _ready() -> void:
 func open_chest(chest_node: Node, model: InventoryModelType) -> void:
 	current_chest = chest_node
 	chest_model = model
+	if not player_ref or not is_instance_valid(player_ref):
+		if chest_node and chest_node.get("player") and is_instance_valid(chest_node.get("player")):
+			player_ref = chest_node.get("player")
+		elif get_tree():
+			player_ref = get_tree().get_first_node_in_group("Player")
 	if not chest_model.changed.is_connected(_sync_slots):
 		chest_model.changed.connect(_sync_slots)
 	
@@ -86,12 +91,7 @@ func _open() -> void:
 	
 	var tw := create_tween()
 	tw.tween_property(root_panel, "position:x", MARGIN_LEFT, 0.30).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
-	
-	# Автоматически открываем инвентарь игрока справа, если он закрыт
-	if player_ref and player_ref.get("inventory_ui"):
-		var inv_ui = player_ref.inventory_ui
-		if inv_ui and not inv_ui.is_open:
-			inv_ui._open()
+
 
 
 func close_chest() -> void:
@@ -209,8 +209,15 @@ func _transfer_item(source: InventorySlot, target: InventorySlot) -> void:
 		_transfer_player_to_chest(source, target)
 
 
+func _ensure_player_ref() -> bool:
+	if not player_ref or not is_instance_valid(player_ref):
+		if get_tree():
+			player_ref = get_tree().get_first_node_in_group("Player")
+	return player_ref != null and player_ref.get("inventory_ui") != null
+
+
 func _transfer_chest_to_player(source: InventorySlot, target: InventorySlot) -> void:
-	if not player_ref or not player_ref.get("inventory_ui"):
+	if not _ensure_player_ref():
 		return
 	var player_inv_ui = player_ref.inventory_ui
 	var player_model = player_inv_ui.inventory_model
@@ -236,6 +243,7 @@ func _transfer_chest_to_player(source: InventorySlot, target: InventorySlot) -> 
 			var dest_index: int = target.slot_index if target.slot_index >= 0 else -1
 			player_model._put_item(target_ref, removed, dest_index)
 			player_model.changed.emit()
+			chest_model.changed.emit()
 	else:
 		# Обмен предметами между сундуком и инвентарём
 		if player_model.can_accept(target_ref, item_to_move) and chest_model.can_accept(chest_model.grid_ref(source.slot_index), target_item):
@@ -248,7 +256,7 @@ func _transfer_chest_to_player(source: InventorySlot, target: InventorySlot) -> 
 
 
 func _transfer_player_to_chest(source: InventorySlot, target: InventorySlot) -> void:
-	if not player_ref or not player_ref.get("inventory_ui"):
+	if not _ensure_player_ref():
 		return
 	var player_inv_ui = player_ref.inventory_ui
 	var player_model = player_inv_ui.inventory_model
@@ -273,6 +281,7 @@ func _transfer_player_to_chest(source: InventorySlot, target: InventorySlot) -> 
 		if chest_model.can_accept(target_ref, item_to_move):
 			var removed: Dictionary = player_model.remove_item(source_ref)
 			chest_model._put_item(target_ref, removed, target.slot_index)
+			player_model.changed.emit()
 			chest_model.changed.emit()
 	else:
 		if chest_model.can_accept(target_ref, item_to_move) and player_model.can_accept(source_ref, target_item):
@@ -298,8 +307,13 @@ func _can_drop_on_slot(source: InventorySlot, target: InventorySlot, dragged_ite
 		if player_ref and player_ref.get("inventory_ui"):
 			var player_inv_ui = player_ref.inventory_ui
 			var player_model = player_inv_ui.inventory_model
-			if player_model and target.slot_index >= 0:
-				return player_model.can_accept(player_model.grid_ref(target.slot_index), dragged_item)
+			if player_model:
+				if target.slot_index >= 0:
+					return player_model.can_accept(player_model.grid_ref(target.slot_index), dragged_item)
+				else:
+					var equip_key: String = str(player_inv_ui.equipment_key_by_slot.get(target, ""))
+					if not equip_key.is_empty():
+						return player_model.can_accept(player_model.equipment_ref(equip_key), dragged_item)
 	return false
 
 

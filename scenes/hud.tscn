@@ -333,7 +333,7 @@ size_flags_vertical = 0
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 4
 theme_override_font_sizes/font_size = 9
-text = "2"
+text = "1"
 
 [node name="CooldownOverlay" type="ColorRect" parent="Control/BottomCenterPanel/HotbarContainer/Slot2"]
 visible = false
@@ -397,7 +397,7 @@ size_flags_vertical = 0
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 4
 theme_override_font_sizes/font_size = 9
-text = "3"
+text = "2"
 
 [node name="CooldownOverlay" type="ColorRect" parent="Control/BottomCenterPanel/HotbarContainer/Slot3"]
 visible = false
@@ -460,7 +460,7 @@ size_flags_vertical = 0
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 4
 theme_override_font_sizes/font_size = 9
-text = "4"
+text = "3"
 
 [node name="Slot5" type="PanelContainer" parent="Control/BottomCenterPanel/HotbarContainer"]
 custom_minimum_size = Vector2(54, 54)
@@ -481,7 +481,7 @@ size_flags_vertical = 0
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 4
 theme_override_font_sizes/font_size = 9
-text = "5"
+text = "4"
 
 [node name="Slot6" type="PanelContainer" parent="Control/BottomCenterPanel/HotbarContainer"]
 custom_minimum_size = Vector2(54, 54)
@@ -502,7 +502,7 @@ size_flags_vertical = 0
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 4
 theme_override_font_sizes/font_size = 9
-text = "6"
+text = "5"
 
 [node name="Slot7" type="PanelContainer" parent="Control/BottomCenterPanel/HotbarContainer"]
 custom_minimum_size = Vector2(54, 54)
@@ -523,7 +523,7 @@ size_flags_vertical = 0
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 4
 theme_override_font_sizes/font_size = 9
-text = "7"
+text = "6"
 
 [node name="Slot8" type="PanelContainer" parent="Control/BottomCenterPanel/HotbarContainer"]
 custom_minimum_size = Vector2(54, 54)
@@ -544,7 +544,8 @@ size_flags_vertical = 0
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 4
 theme_override_font_sizes/font_size = 9
-text = "8"
+text = "7"
+
 
 [node name="MinimapPanel" type="PanelContainer" parent="Control"]
 layout_mode = 1

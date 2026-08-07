@@ -43,11 +43,13 @@ var _flask_controls: Dictionary = {}
 var _flask_bar: HBoxContainer = null
 
 func _ready() -> void:
+	add_to_group("HUD")
 	_apply_gothic_hud_style()
 	_force_runtime_ui_layout()
 	_setup_procedural_orbs()
 	_create_locked_slot_overlays()
 	_setup_cooldown_overlays()
+	_create_target_frame()
 	
 	# Подключаем сигналы наведения мыши после создания тултипов
 	var s1 = $Control/BottomCenterPanel/HotbarContainer/Slot1
@@ -656,4 +658,101 @@ func _update_cooldown_visual(state: Dictionary) -> void:
 
 	if remaining <= 0.0:
 		overlay.visible = false
-		timer_label.text = ""
+
+
+# ─── Target Frame (Отображение текущей цели при наведении/атаке) ─────────────
+
+var _target_frame: PanelContainer = null
+var _target_name_label: Label = null
+var _target_hp_bar: ProgressBar = null
+var _target_hp_label: Label = null
+
+func _create_target_frame() -> void:
+	var control := $Control as Control
+	if not control: return
+	
+	_target_frame = PanelContainer.new()
+	_target_frame.name = "TargetFrame"
+	_target_frame.custom_minimum_size = Vector2(280, 52)
+	_target_frame.anchor_left = 0.5
+	_target_frame.anchor_right = 0.5
+	_target_frame.anchor_top = 0.0
+	_target_frame.anchor_bottom = 0.0
+	_target_frame.offset_left = -140.0
+	_target_frame.offset_top = 20.0
+	_target_frame.offset_right = 140.0
+	_target_frame.offset_bottom = 72.0
+	_target_frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_target_frame.visible = false
+	
+	var sb := GothicUI.panel_style(Color(0.025, 0.016, 0.013, 0.95), GothicUI.BRASS_DARK, 2, 0, 8)
+	_target_frame.add_theme_stylebox_override("panel", sb)
+	
+	var margin := MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 10)
+	margin.add_theme_constant_override("margin_top", 4)
+	margin.add_theme_constant_override("margin_right", 10)
+	margin.add_theme_constant_override("margin_bottom", 6)
+	_target_frame.add_child(margin)
+	
+	var vbox := VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 2)
+	margin.add_child(vbox)
+	
+	_target_name_label = Label.new()
+	_target_name_label.text = "Враг"
+	_target_name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_target_name_label.add_theme_font_size_override("font_size", 12)
+	_target_name_label.add_theme_color_override("font_color", GothicUI.BRASS_LIGHT)
+	_target_name_label.add_theme_color_override("font_outline_color", GothicUI.INK)
+	_target_name_label.add_theme_constant_override("outline_size", 3)
+	vbox.add_child(_target_name_label)
+	
+	_target_hp_bar = ProgressBar.new()
+	_target_hp_bar.min_value = 0
+	_target_hp_bar.max_value = 100
+	_target_hp_bar.value = 100
+	_target_hp_bar.show_percentage = false
+	_target_hp_bar.custom_minimum_size = Vector2(0, 20)
+	
+	var sb_bg := GothicUI.panel_style(Color(0.1, 0.06, 0.04, 0.9), Color(0.3, 0.2, 0.1, 1), 1)
+	var sb_fg := GothicUI.panel_style(Color(0.82, 0.15, 0.15, 1), Color(0, 0, 0, 0), 0)
+	_target_hp_bar.add_theme_stylebox_override("background", sb_bg)
+	_target_hp_bar.add_theme_stylebox_override("fill", sb_fg)
+	
+	_target_hp_label = Label.new()
+	_target_hp_label.anchor_left = 0.0
+	_target_hp_label.anchor_top = 0.0
+	_target_hp_label.anchor_right = 1.0
+	_target_hp_label.anchor_bottom = 1.0
+	_target_hp_label.offset_left = 0; _target_hp_label.offset_top = 0
+	_target_hp_label.offset_right = 0; _target_hp_label.offset_bottom = 0
+	_target_hp_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_target_hp_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_target_hp_label.add_theme_font_size_override("font_size", 11)
+	_target_hp_label.add_theme_color_override("font_color", GothicUI.BONE)
+	_target_hp_label.add_theme_color_override("font_outline_color", GothicUI.INK)
+	_target_hp_label.add_theme_constant_override("outline_size", 3)
+	_target_hp_bar.add_child(_target_hp_label)
+	
+	vbox.add_child(_target_hp_bar)
+	control.add_child(_target_frame)
+
+
+func show_target_info(enemy_name: String, current_hp: int, max_hp: int) -> void:
+	if not _target_frame:
+		_create_target_frame()
+	if _target_name_label:
+		_target_name_label.text = enemy_name
+	if _target_hp_bar:
+		_target_hp_bar.max_value = max_hp
+		_target_hp_bar.value = current_hp
+	if _target_hp_label:
+		_target_hp_label.text = "%d / %d HP" % [current_hp, max_hp]
+	if _target_frame:
+		_target_frame.visible = true
+
+
+func hide_target_info() -> void:
+	if _target_frame:
+		_target_frame.visible = false

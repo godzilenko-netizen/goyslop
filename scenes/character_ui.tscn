@@ -1,0 +1,851 @@
+[gd_scene load_steps=14 format=3]
+
+[ext_resource type="Script" path="res://scripts/character_ui.gd" id="1_script"]
+[ext_resource type="Theme" path="res://themes/diablo2_theme.tres" id="3_theme"]
+
+; ─── StyleBoxes (идентичны inventory_ui.tscn) ───────────────────────────────
+
+[sub_resource type="StyleBoxFlat" id="SB_outer"]
+bg_color = Color(0.10, 0.085, 0.062, 0.99)
+border_width_left = 8
+border_width_top = 8
+border_width_right = 4
+border_width_bottom = 8
+border_color = Color(0.55, 0.40, 0.10, 1.0)
+corner_radius_top_left = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0.0, 0.0, 0.0, 0.95)
+shadow_size = 40
+shadow_offset = Vector2(-10, 0)
+
+[sub_resource type="StyleBoxFlat" id="SB_inner_border"]
+bg_color = Color(0.065, 0.054, 0.038, 0.99)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.28, 0.20, 0.07, 1.0)
+corner_radius_top_left = 10
+corner_radius_top_right = 0
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="SB_section"]
+bg_color = Color(0.050, 0.042, 0.030, 0.97)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.38, 0.28, 0.09, 1.0)
+corner_radius_top_left = 7
+corner_radius_top_right = 7
+corner_radius_bottom_right = 7
+corner_radius_bottom_left = 7
+shadow_color = Color(0.0, 0.0, 0.0, 0.7)
+shadow_size = 8
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="SB_portrait"]
+bg_color = Color(0.028, 0.022, 0.014, 0.97)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.55, 0.40, 0.10, 1.0)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+shadow_color = Color(0.0, 0.0, 0.0, 0.9)
+shadow_size = 10
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="SB_stat_group"]
+bg_color = Color(0.038, 0.030, 0.020, 0.98)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.32, 0.23, 0.07, 1.0)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+shadow_color = Color(0.0, 0.0, 0.0, 0.6)
+shadow_size = 5
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="SB_dev_section"]
+bg_color = Color(0.038, 0.030, 0.020, 0.98)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.38, 0.28, 0.09, 1.0)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+shadow_color = Color(0.0, 0.0, 0.0, 0.8)
+shadow_size = 12
+shadow_offset = Vector2(0, 5)
+
+[sub_resource type="StyleBoxFlat" id="SB_tab_active"]
+bg_color = Color(0.068, 0.054, 0.032, 0.99)
+border_width_left = 2
+border_width_top = 3
+border_width_right = 2
+border_width_bottom = 0
+border_color = Color(0.55, 0.40, 0.10, 1.0)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 0
+
+[sub_resource type="StyleBoxFlat" id="SB_tab_inactive"]
+bg_color = Color(0.040, 0.032, 0.020, 0.90)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 0
+border_color = Color(0.28, 0.20, 0.07, 1.0)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 0
+
+[sub_resource type="StyleBoxFlat" id="SB_xp_bar_bg"]
+bg_color = Color(0.020, 0.016, 0.010, 0.97)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.28, 0.20, 0.07, 1.0)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="SB_xp_bar_fill"]
+bg_color = Color(0.55, 0.35, 0.08, 1.0)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="SB_divider"]
+bg_color = Color(0.50, 0.36, 0.08, 1.0)
+
+[sub_resource type="StyleBoxFlat" id="SB_footer"]
+bg_color = Color(0.058, 0.046, 0.030, 0.99)
+border_width_left = 2
+border_width_top = 3
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.42, 0.30, 0.08, 1.0)
+corner_radius_top_left = 0
+corner_radius_top_right = 0
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+; ─── Scene tree ─────────────────────────────────────────────────────────────
+
+[node name="CharacterUI" type="CanvasLayer"]
+layer = 12
+process_mode = 3
+script = ExtResource("1_script")
+
+[node name="RootPanel" type="PanelContainer" parent="."]
+anchors_preset = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 100.0
+offset_bottom = 100.0
+grow_horizontal = 0
+grow_vertical = 0
+theme = ExtResource("3_theme")
+theme_override_styles/panel = SubResource("SB_outer")
+
+[node name="InnerBorder" type="PanelContainer" parent="RootPanel"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_inner_border")
+
+[node name="OM" type="MarginContainer" parent="RootPanel/InnerBorder"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
+
+[node name="VBox" type="VBoxContainer" parent="RootPanel/InnerBorder/OM"]
+custom_minimum_size = Vector2(480, 0)
+layout_mode = 2
+theme_override_constants/separation = 10
+
+; ── Title Bar ────────────────────────────────────────────────────────────────
+
+[node name="TitleBar" type="HBoxContainer" parent="RootPanel/InnerBorder/OM/VBox"]
+layout_mode = 2
+
+[node name="CornerL" type="Label" parent="RootPanel/InnerBorder/OM/VBox/TitleBar"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.60, 0.44, 0.10, 1)
+theme_override_font_sizes/font_size = 14
+text = "✦"
+
+[node name="TitleText" type="Label" parent="RootPanel/InnerBorder/OM/VBox/TitleBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.82, 0.64, 0.20, 1)
+theme_override_font_sizes/font_size = 12
+text = "Х А Р А К Т Е Р И С Т И К И"
+horizontal_alignment = 1
+
+[node name="CornerR" type="Label" parent="RootPanel/InnerBorder/OM/VBox/TitleBar"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.60, 0.44, 0.10, 1)
+theme_override_font_sizes/font_size = 14
+text = "✦"
+
+[node name="CloseBtn" type="Button" parent="RootPanel/InnerBorder/OM/VBox/TitleBar"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.35, 0.26, 0.10, 0.85)
+theme_override_font_sizes/font_size = 13
+text = "  ×  "
+
+; ── Separator 1 ──────────────────────────────────────────────────────────────
+
+[node name="Sep1" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox"]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_divider")
+
+; ── Main Section (Left: персонаж | Right: характеристики) ────────────────────
+
+[node name="MainSection" type="HBoxContainer" parent="RootPanel/InnerBorder/OM/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+; ── Left: карточка персонажа ─────────────────────────────────────────────────
+
+[node name="CharacterPanel" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection"]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_section")
+
+[node name="CPM" type="MarginContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/CharacterPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="CPVBox" type="VBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/CharacterPanel/CPM"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+; Портрет-заглушка
+[node name="PortraitBox" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/CharacterPanel/CPM/CPVBox"]
+custom_minimum_size = Vector2(140, 170)
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_portrait")
+
+[node name="PortraitInner" type="MarginContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/CharacterPanel/CPM/CPVBox/PortraitBox"]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="PortraitVBox" type="VBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/CharacterPanel/CPM/CPVBox/PortraitBox/PortraitInner"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="PortraitIcon" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/CharacterPanel/CPM/CPVBox/PortraitBox/PortraitInner/PortraitVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.32, 0.24, 0.08, 0.45)
+theme_override_font_sizes/font_size = 52
+text = "⚔"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PortraitLabel" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/CharacterPanel/CPM/CPVBox/PortraitBox/PortraitInner/PortraitVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.30, 0.22, 0.07, 0.55)
+theme_override_font_sizes/font_size = 9
+text = "ПОРТРЕТ"
+horizontal_alignment = 1
+
+; Имя персонажа
+[node name="CharNameLbl" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/CharacterPanel/CPM/CPVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.64, 0.20, 1)
+theme_override_font_sizes/font_size = 12
+text = "— — —"
+horizontal_alignment = 1
+
+; Класс
+[node name="CharClassLbl" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/CharacterPanel/CPM/CPVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.55, 0.40, 0.14, 0.85)
+theme_override_font_sizes/font_size = 10
+text = "К Л А С С"
+horizontal_alignment = 1
+
+; Разделитель
+[node name="CharDivider" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/CharacterPanel/CPM/CPVBox"]
+custom_minimum_size = Vector2(0, 1)
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_divider")
+
+; Уровень
+[node name="LevelRow" type="HBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/CharacterPanel/CPM/CPVBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="LevelIcon" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/CharacterPanel/CPM/CPVBox/LevelRow"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.60, 0.44, 0.10, 1)
+theme_override_font_sizes/font_size = 11
+text = "◆"
+
+[node name="LevelKey" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/CharacterPanel/CPM/CPVBox/LevelRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.55, 0.40, 0.14, 0.75)
+theme_override_font_sizes/font_size = 10
+text = "УРОВЕНЬ"
+
+[node name="LevelVal" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/CharacterPanel/CPM/CPVBox/LevelRow"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.82, 0.64, 0.20, 1)
+theme_override_font_sizes/font_size = 11
+text = "—"
+horizontal_alignment = 2
+
+; XP Bar
+[node name="XPBarBg" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/CharacterPanel/CPM/CPVBox"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_xp_bar_bg")
+
+[node name="XPBarFill" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/CharacterPanel/CPM/CPVBox/XPBarBg"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+size_flags_horizontal = 0
+anchor_right = 0.35
+theme_override_styles/panel = SubResource("SB_xp_bar_fill")
+
+[node name="XPLabel" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/CharacterPanel/CPM/CPVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.38, 0.28, 0.09, 0.6)
+theme_override_font_sizes/font_size = 9
+text = "ОПЫТ"
+horizontal_alignment = 1
+
+; Spacer внизу карточки
+[node name="CharSpacer" type="Control" parent="RootPanel/InnerBorder/OM/VBox/MainSection/CharacterPanel/CPM/CPVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+; ── Right: панель характеристик ───────────────────────────────────────────────
+
+[node name="StatsPanel" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("SB_section")
+
+[node name="SPM" type="MarginContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="SPVBox" type="VBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+; ──── Группа: Основные атрибуты ──────────────────────────────────────────────
+
+[node name="GroupPrimary" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_stat_group")
+
+[node name="GPM" type="MarginContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupPrimary"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 6
+
+[node name="GPVBox" type="VBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupPrimary/GPM"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="PrimaryHeader" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupPrimary/GPM/GPVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.70, 0.52, 0.14, 1)
+theme_override_font_sizes/font_size = 10
+text = "О С Н О В Н Ы Е"
+
+[node name="PrimaryDivider" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupPrimary/GPM/GPVBox"]
+custom_minimum_size = Vector2(0, 1)
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_divider")
+
+[node name="PrimaryRow1" type="HBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupPrimary/GPM/GPVBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="PR1Key" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupPrimary/GPM/GPVBox/PrimaryRow1"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.55, 0.40, 0.14, 0.75)
+theme_override_font_sizes/font_size = 10
+text = "Сила"
+
+[node name="PR1Val" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupPrimary/GPM/GPVBox/PrimaryRow1"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.64, 0.20, 1)
+theme_override_font_sizes/font_size = 10
+text = "—"
+
+[node name="PrimaryRow2" type="HBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupPrimary/GPM/GPVBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="PR2Key" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupPrimary/GPM/GPVBox/PrimaryRow2"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.55, 0.40, 0.14, 0.75)
+theme_override_font_sizes/font_size = 10
+text = "Ловкость"
+
+[node name="PR2Val" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupPrimary/GPM/GPVBox/PrimaryRow2"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.64, 0.20, 1)
+theme_override_font_sizes/font_size = 10
+text = "—"
+
+[node name="PrimaryRow4" type="HBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupPrimary/GPM/GPVBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="PR4Key" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupPrimary/GPM/GPVBox/PrimaryRow4"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.55, 0.40, 0.14, 0.75)
+theme_override_font_sizes/font_size = 10
+text = "Интеллект"
+
+[node name="PR4Val" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupPrimary/GPM/GPVBox/PrimaryRow4"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.64, 0.20, 1)
+theme_override_font_sizes/font_size = 10
+text = "—"
+
+; ──── Группа: Производные (ХП, Мана, Урон) ───────────────────────────────────
+
+[node name="GroupDerived" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_stat_group")
+
+[node name="GDM" type="MarginContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupDerived"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 6
+
+[node name="GDVBox" type="VBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupDerived/GDM"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="DerivedHeader" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupDerived/GDM/GDVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.70, 0.52, 0.14, 1)
+theme_override_font_sizes/font_size = 10
+text = "П Р О И З В О Д Н Ы Е"
+
+[node name="DerivedDivider" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupDerived/GDM/GDVBox"]
+custom_minimum_size = Vector2(0, 1)
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_divider")
+
+[node name="DerivedRow1" type="HBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupDerived/GDM/GDVBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="D1Key" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupDerived/GDM/GDVBox/DerivedRow1"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.55, 0.40, 0.14, 0.75)
+theme_override_font_sizes/font_size = 10
+text = "Очки здоровья"
+
+[node name="D1Val" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupDerived/GDM/GDVBox/DerivedRow1"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.72, 0.22, 0.18, 1)
+theme_override_font_sizes/font_size = 10
+text = "— / —"
+
+[node name="DerivedRow2" type="HBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupDerived/GDM/GDVBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="D2Key" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupDerived/GDM/GDVBox/DerivedRow2"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.55, 0.40, 0.14, 0.75)
+theme_override_font_sizes/font_size = 10
+text = "Очки маны"
+
+[node name="D2Val" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupDerived/GDM/GDVBox/DerivedRow2"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.22, 0.42, 0.72, 1)
+theme_override_font_sizes/font_size = 10
+text = "— / —"
+
+[node name="DerivedRow3" type="HBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupDerived/GDM/GDVBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="D3Key" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupDerived/GDM/GDVBox/DerivedRow3"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.55, 0.40, 0.14, 0.75)
+theme_override_font_sizes/font_size = 10
+text = "Урон (ЛКМ)"
+
+[node name="D3Val" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupDerived/GDM/GDVBox/DerivedRow3"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.64, 0.20, 1)
+theme_override_font_sizes/font_size = 10
+text = "—"
+
+; ──── Группа: Критический урон ──────────────────────────────────────────
+
+[node name="GroupCrit" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_stat_group")
+
+[node name="GCM2" type="MarginContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupCrit"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 6
+
+[node name="GCVBox2" type="VBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupCrit/GCM2"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="CritHeader" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupCrit/GCM2/GCVBox2"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.70, 0.52, 0.14, 1)
+theme_override_font_sizes/font_size = 10
+text = "К Р И Т И Ч Е С К И Й  У Р О Н"
+
+[node name="CritDivider" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupCrit/GCM2/GCVBox2"]
+custom_minimum_size = Vector2(0, 1)
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_divider")
+
+[node name="CritRow1" type="HBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupCrit/GCM2/GCVBox2"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="CritChanceKey" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupCrit/GCM2/GCVBox2/CritRow1"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.55, 0.40, 0.14, 0.75)
+theme_override_font_sizes/font_size = 10
+text = "Шанс крита (физ.)"
+
+[node name="CritChanceVal" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupCrit/GCM2/GCVBox2/CritRow1"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.64, 0.20, 1)
+theme_override_font_sizes/font_size = 10
+text = "—%"
+
+[node name="CritRow2" type="HBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupCrit/GCM2/GCVBox2"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="CritScaleKey" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupCrit/GCM2/GCVBox2/CritRow2"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.55, 0.40, 0.14, 0.75)
+theme_override_font_sizes/font_size = 10
+text = "Множитель крита"
+
+[node name="CritScaleVal" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupCrit/GCM2/GCVBox2/CritRow2"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.64, 0.20, 1)
+theme_override_font_sizes/font_size = 10
+text = "—%"
+
+; ──── Группа: Магический урон ──────────────────────────────────────────
+
+[node name="GroupMagicCrit" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_stat_group")
+
+[node name="GMC" type="MarginContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupMagicCrit"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 6
+
+[node name="GMCVBox" type="VBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupMagicCrit/GMC"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="MagicCritHeader" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupMagicCrit/GMC/GMCVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.70, 0.52, 0.14, 1)
+theme_override_font_sizes/font_size = 10
+text = "М А Г И Ч Е С К И Й  У Р О Н"
+
+[node name="MagicCritDivider" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupMagicCrit/GMC/GMCVBox"]
+custom_minimum_size = Vector2(0, 1)
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_divider")
+
+[node name="MagicCritRow1" type="HBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupMagicCrit/GMC/GMCVBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="MagicCritChanceKey" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupMagicCrit/GMC/GMCVBox/MagicCritRow1"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.55, 0.40, 0.14, 0.75)
+theme_override_font_sizes/font_size = 10
+text = "Шанс крита (маг.)"
+
+[node name="MagicCritChanceVal" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupMagicCrit/GMC/GMCVBox/MagicCritRow1"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.64, 0.20, 1)
+theme_override_font_sizes/font_size = 10
+text = "—%"
+
+[node name="MagicCritRow2" type="HBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupMagicCrit/GMC/GMCVBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="MagicCritScaleKey" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupMagicCrit/GMC/GMCVBox/MagicCritRow2"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.55, 0.40, 0.14, 0.75)
+theme_override_font_sizes/font_size = 10
+text = "Множитель маг. крита"
+
+[node name="MagicCritScaleVal" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupMagicCrit/GMC/GMCVBox/MagicCritRow2"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.64, 0.20, 1)
+theme_override_font_sizes/font_size = 10
+text = "—%"
+
+
+; ──── Группа: Сопротивления ───────────────────────────────────────────────────
+
+[node name="GroupResist" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_stat_group")
+
+[node name="GRM" type="MarginContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupResist"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 6
+
+[node name="GRVBox" type="VBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupResist/GRM"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ResistHeader" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupResist/GRM/GRVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.70, 0.52, 0.14, 1)
+theme_override_font_sizes/font_size = 10
+text = "С О П Р О Т И В Л Е Н И Я"
+
+[node name="ResistDivider" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupResist/GRM/GRVBox"]
+custom_minimum_size = Vector2(0, 1)
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_divider")
+
+[node name="ResistRow1" type="HBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupResist/GRM/GRVBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="RR1Key" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupResist/GRM/GRVBox/ResistRow1"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.55, 0.40, 0.14, 0.75)
+theme_override_font_sizes/font_size = 10
+text = "Огонь"
+
+[node name="RR1Val" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupResist/GRM/GRVBox/ResistRow1"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.40, 0.12, 1)
+theme_override_font_sizes/font_size = 10
+text = "—%"
+
+[node name="ResistRowCold" type="HBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupResist/GRM/GRVBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="RRColdKey" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupResist/GRM/GRVBox/ResistRowCold"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.55, 0.40, 0.14, 0.75)
+theme_override_font_sizes/font_size = 10
+text = "Холод"
+
+[node name="RRColdVal" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupResist/GRM/GRVBox/ResistRowCold"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.35, 0.75, 0.95, 1)
+theme_override_font_sizes/font_size = 10
+text = "—%"
+
+[node name="ResistRow2" type="HBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupResist/GRM/GRVBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="RR2Key" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupResist/GRM/GRVBox/ResistRow2"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.55, 0.40, 0.14, 0.75)
+theme_override_font_sizes/font_size = 10
+text = "Молния"
+
+[node name="RR2Val" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupResist/GRM/GRVBox/ResistRow2"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.40, 0.60, 0.90, 1)
+theme_override_font_sizes/font_size = 10
+text = "—%"
+
+
+[node name="ResistRow3" type="HBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupResist/GRM/GRVBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="RR3Key" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupResist/GRM/GRVBox/ResistRow3"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.55, 0.40, 0.14, 0.75)
+theme_override_font_sizes/font_size = 10
+text = "Физ. урон"
+
+[node name="RR3Val" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupResist/GRM/GRVBox/ResistRow3"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.72, 0.68, 0.60, 1)
+theme_override_font_sizes/font_size = 10
+text = "—%"
+
+; ──── Группа: Защита ───────────────────────────────────────────────────
+
+[node name="GroupCombat" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("SB_stat_group")
+
+[node name="GCM" type="MarginContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupCombat"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 6
+
+[node name="GCVBox" type="VBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupCombat/GCM"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="CombatHeader" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupCombat/GCM/GCVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.70, 0.52, 0.14, 1)
+theme_override_font_sizes/font_size = 10
+text = "З А Щ И Т А"
+
+[node name="CombatDivider" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupCombat/GCM/GCVBox"]
+custom_minimum_size = Vector2(0, 1)
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_divider")
+
+[node name="CombatRow2" type="HBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupCombat/GCM/GCVBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="CC2Key" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupCombat/GCM/GCVBox/CombatRow2"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.55, 0.40, 0.14, 0.75)
+theme_override_font_sizes/font_size = 10
+text = "Броня"
+
+[node name="CC2Val" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupCombat/GCM/GCVBox/CombatRow2"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.64, 0.20, 1)
+theme_override_font_sizes/font_size = 10
+text = "—"
+
+[node name="CombatRow3" type="HBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupCombat/GCM/GCVBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="CC3Key" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupCombat/GCM/GCVBox/CombatRow3"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.55, 0.40, 0.14, 0.75)
+theme_override_font_sizes/font_size = 10
+text = "Уклонение"
+
+[node name="CC3Val" type="Label" parent="RootPanel/InnerBorder/OM/VBox/MainSection/StatsPanel/SPM/SPVBox/GroupCombat/GCM/GCVBox/CombatRow3"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.64, 0.20, 1)
+theme_override_font_sizes/font_size = 10
+text = "—%"
+
+; ── Footer ────────────────────────────────────────────────────────────────────
+
+[node name="Footer" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_footer")
+
+[node name="FM" type="MarginContainer" parent="RootPanel/InnerBorder/OM/VBox/Footer"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 6
+
+[node name="FHBox" type="HBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/Footer/FM"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="KeyHintLbl" type="Label" parent="RootPanel/InnerBorder/OM/VBox/Footer/FM/FHBox"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.32, 0.24, 0.08, 0.60)
+theme_override_font_sizes/font_size = 10
+text = "[ C ]  Характеристики"
+
+[node name="FSpacer" type="Control" parent="RootPanel/InnerBorder/OM/VBox/Footer/FM/FHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="FooterCloseBtn" type="Button" parent="RootPanel/InnerBorder/OM/VBox/Footer/FM/FHBox"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.35, 0.26, 0.10, 0.9)
+theme_override_font_sizes/font_size = 10
+text = "[ З А К Р Ы Т Ь ]"

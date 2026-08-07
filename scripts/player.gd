@@ -15,12 +15,12 @@ const ICE_ARROW_SKILL = preload("res://data/skills/ice_arrow.tres")
 const BASIC_HEALTH_FLASK = preload("res://data/flasks/basic_health_flask.tres")
 const BASIC_MANA_FLASK = preload("res://data/flasks/basic_mana_flask.tres")
 
-@export var walk_speed: float = 5.0
-@export var sprint_speed: float = 10.0
-var current_speed: float = 5.0
+@export var walk_speed: float = 2.0
+@export var sprint_speed: float = 3.6
+var current_speed: float = 2.0
 
-@export var acceleration: float = 20.0
-@export var friction: float = 25.0
+@export var acceleration: float = 12.0
+@export var friction: float = 15.0
 @export var gravity: float = 25.0
 
 # РЎС‚Р°С‚С‹ РёРіСЂРѕРєР°
@@ -52,6 +52,8 @@ var _regen_timer: float = 0.0
 @onready var hud: GameHUDType = $HUD
 @onready var inventory_ui: CanvasLayer = $InventoryUI
 @onready var mana_warning: Label3D = $ManaWarning
+@onready var attributes: CharacterAttributes = $CharacterAttributes
+var character_ui: CanvasLayer = null
 
 var anim_player: AnimationPlayer = null
 var is_moving_backwards_state: bool = false
@@ -70,6 +72,15 @@ func _ready() -> void:
 		
 	if inventory_ui:
 		inventory_ui.player_ref = self
+	# Найти CharacterUI в дереве сцены (инстанцирован не под игроком)
+	character_ui = get_tree().root.find_child("CharacterUI", true, false) as CanvasLayer
+	if character_ui and character_ui.has_method("open"):
+		character_ui.player_ref = self
+	# Атрибуты → применить бонусы к PlayerStats при любом изменении
+	attributes.attributes_changed.connect(
+		func() -> void: stats.apply_attribute_bonuses(attributes)
+	)
+	attributes.recalculate()  # первый пересчёт на старте
 	stats.health_changed.connect(hud.update_hp)
 	stats.energy_changed.connect(hud.update_energy)
 	stats.experience_changed.connect(hud.update_xp)
@@ -192,11 +203,8 @@ func _physics_process(delta: float) -> void:
 		if not is_on_floor(): velocity.y -= gravity * delta
 		move_and_slide()
 		return
-	_regen_timer += delta
-	if _regen_timer >= 1.0:
-		_regen_timer -= 1.0
-		stats.restore_health(1)
-		stats.restore_energy(1)
+	# Регенерация HP и маны через атрибуты
+	stats.tick_regen(delta)
 
 	# Р“СЂР°РІРёС‚Р°С†РёСЏ
 	if not is_on_floor():
@@ -316,6 +324,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		print("Inventory input received!")
 		if inventory_ui and inventory_ui.has_method("toggle"):
 			inventory_ui.toggle()
+	elif event.is_action_pressed("character_screen"):
+		if character_ui and character_ui.has_method("toggle"):
+			character_ui.toggle()
 	elif event.is_action_pressed("interact"):
 		interact()
 	elif event is InputEventKey and event.pressed and not event.echo:

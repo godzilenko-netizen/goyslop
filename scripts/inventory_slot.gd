@@ -130,14 +130,13 @@ func _refresh() -> void:
 	var icon_path := str(item.get("icon", ""))
 	if not icon_path.is_empty():
 		var tex: Texture2D = null
-		if ResourceLoader.exists(icon_path):
+		var global_p := ProjectSettings.globalize_path(icon_path)
+		if FileAccess.file_exists(global_p):
+			var img := Image.load_from_file(global_p)
+			if img:
+				tex = ImageTexture.create_from_image(img)
+		if not tex and ResourceLoader.exists(icon_path):
 			tex = load(icon_path) as Texture2D
-		if not tex:
-			var global_p := ProjectSettings.globalize_path(icon_path)
-			if FileAccess.file_exists(global_p):
-				var img := Image.load_from_file(global_p)
-				if img:
-					tex = ImageTexture.create_from_image(img)
 		_item_icon.texture = tex
 		_item_icon.visible = _item_icon.texture != null
 	else:

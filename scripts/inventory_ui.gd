@@ -239,9 +239,9 @@ func _transfer_item(source: InventorySlot, target: InventorySlot) -> void:
 	if _is_my_slot(source) and _is_my_slot(target):
 		inventory_model.transfer(_slot_ref(source), _slot_ref(target))
 	else:
-		var chest_ui = get_tree().root.get_node_or_null("ChestUI")
-		if chest_ui and chest_ui.is_open and chest_ui.has_method("_transfer_item"):
-			chest_ui._transfer_item(source, target)
+		var chest_ui := _get_chest_ui()
+		if chest_ui and chest_ui.has_method("_transfer_item"):
+			chest_ui.call("_transfer_item", source, target)
 
 
 func _can_drop_on_slot(source: InventorySlot, target: InventorySlot, dragged_item: Dictionary) -> bool:
@@ -340,7 +340,7 @@ func _drop_item_to_world(source: InventorySlot, _dragged_item: Dictionary) -> vo
 func _activate_item(slot: InventorySlot) -> void:
 	if slot.item.is_empty():
 		return
-	var chest_ui = get_tree().root.get_node_or_null("ChestUI")
+	var chest_ui := _get_chest_ui()
 	if chest_ui and chest_ui.get("is_open") and chest_ui.get("chest_model"):
 		var c_model = chest_ui.chest_model
 		if c_model and c_model.add_item(slot.item):
@@ -352,10 +352,17 @@ func _activate_item(slot: InventorySlot) -> void:
 		_use_consumable(slot, effect)
 		return
 	if slot.allowed_category.is_empty():
+		var first_matching_slot: InventorySlot = null
 		for equipment_slot in equipment_slots.values():
-			if equipment_slot.item.is_empty() and equipment_slot.can_accept(slot.item):
-				_transfer_item(slot, equipment_slot)
-				return
+			if equipment_slot.can_accept(slot.item):
+				if not first_matching_slot:
+					first_matching_slot = equipment_slot
+				if equipment_slot.item.is_empty():
+					_transfer_item(slot, equipment_slot)
+					return
+		if first_matching_slot:
+			_transfer_item(slot, first_matching_slot)
+			return
 	else:
 		var empty_slot := _first_empty_grid_slot(slot.item)
 		if empty_slot:
@@ -452,3 +459,9 @@ func _cell_position(index: int) -> Vector2:
 func _update_gold(_value: int = 0) -> void:
 	if gold_label:
 		gold_label.text = str(inventory_model.gold if inventory_model else 0)
+
+
+func _get_chest_ui() -> Node:
+	if not get_tree() or not get_tree().root:
+		return null
+	return get_tree().root.find_child("ChestUI", true, false)

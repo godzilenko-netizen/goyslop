@@ -12,11 +12,12 @@ const LEATHER_ARMOR_DATA = preload("res://data/items/leather_armor.tres")
 
 enum State { CIRCLING, AGGRO, ATTACKING, WAITING, DYING }
 
-@export var walk_speed: float = 3.0
-@export var run_speed: float = 6.0
+@export var walk_speed: float = 1.0
+@export var run_speed: float = 1.8
 @export var circle_radius: float = 10.0
 @export var aggro_range: float = 7.0
 @export var attack_range: float = 2.5
+@export var enemy_name: String = "Тролль"
 @export var attack_damage: int = 40
 @export_range(0.0, 20.0, 0.1) var knockback_horizontal_force: float = 5.0
 @export_range(0.0, 20.0, 0.1) var knockback_vertical_force: float = 4.0
@@ -31,6 +32,7 @@ var model_root: Node3D = null
 var hp_bar: ProgressBar = null
 var hp_viewport: SubViewport = null
 var hp_sprite: Sprite3D = null
+var _status_label: Label3D = null
 
 # Status effects
 var is_frozen: bool = false
@@ -47,12 +49,20 @@ var freeze_mat: StandardMaterial3D
 var burn_mat: StandardMaterial3D
 @onready var health: HealthComponentType = $Health
 
+var hp_name_label: Label = null
+var hp_num_label: Label = null
+var is_hovered: bool = false
+
 func _ready() -> void:
 	add_to_group("Enemies")
 	_active_collision_layer = collision_layer
 	player = get_tree().get_first_node_in_group("Player")
 	health.changed.connect(_on_health_changed)
 	health.died.connect(_die)
+	
+	input_ray_pickable = true
+	mouse_entered.connect(_on_mouse_entered)
+	mouse_exited.connect(_on_mouse_exited)
 	
 	freeze_mat = StandardMaterial3D.new()
 	freeze_mat.albedo_color = Color(0.2, 0.5, 1.0, 0.6)
@@ -77,37 +87,78 @@ func _setup_visuals() -> void:
 		RetroMaterialStylerType.apply_to_model(model_root, Color(0.42, 0.50, 0.34), 0.92)
 
 func _setup_hp_bar() -> void:
-	# Create a SubViewport for the HP Bar UI
 	hp_viewport = SubViewport.new()
 	hp_viewport.transparent_bg = true
-	hp_viewport.size = Vector2i(200, 30)
-	hp_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
+	hp_viewport.size = Vector2i(240, 52)
+	hp_viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	
+	var vbox := VBoxContainer.new()
+	vbox.custom_minimum_size = Vector2(240, 52)
+	vbox.add_theme_constant_override("separation", 2)
+	
+	hp_name_label = Label.new()
+	hp_name_label.text = enemy_name
+	hp_name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	hp_name_label.add_theme_font_size_override("font_size", 13)
+	hp_name_label.add_theme_color_override("font_color", Color(0.92, 0.75, 0.25, 1.0))
+	hp_name_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
+	hp_name_label.add_theme_constant_override("outline_size", 4)
+	vbox.add_child(hp_name_label)
 	
 	hp_bar = ProgressBar.new()
 	hp_bar.min_value = 0
 	hp_bar.max_value = health.max_health
 	hp_bar.value = health.current_health
 	hp_bar.show_percentage = false
-	hp_bar.custom_minimum_size = Vector2(200, 30)
+	hp_bar.custom_minimum_size = Vector2(240, 24)
 	
-	var sb_bg = StyleBoxFlat.new()
-	sb_bg.bg_color = Color(0.2, 0.2, 0.2, 0.8)
-	sb_bg.set_corner_radius_all(4)
-	var sb_fg = StyleBoxFlat.new()
-	sb_fg.bg_color = Color(0.9, 0.1, 0.1, 1.0)
-	sb_fg.set_corner_radius_all(4)
+	var sb_bg := StyleBoxFlat.new()
+	sb_bg.bg_color = Color(0.12, 0.08, 0.06, 0.88)
+	sb_bg.border_color = Color(0.5, 0.35, 0.1, 1.0)
+	sb_bg.set_border_width_all(1)
+	sb_bg.set_corner_radius_all(3)
+	
+	var sb_fg := StyleBoxFlat.new()
+	sb_fg.bg_color = Color(0.85, 0.12, 0.12, 1.0)
+	sb_fg.set_corner_radius_all(3)
+	
 	hp_bar.add_theme_stylebox_override("background", sb_bg)
 	hp_bar.add_theme_stylebox_override("fill", sb_fg)
 	
-	hp_viewport.add_child(hp_bar)
+	hp_num_label = Label.new()
+	hp_num_label.text = "%d / %d HP" % [health.current_health, health.max_health]
+	hp_num_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	hp_num_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	hp_num_label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	hp_num_label.add_theme_font_size_override("font_size", 11)
+	hp_num_label.add_theme_color_override("font_color", Color(1, 0.95, 0.85, 1))
+	hp_num_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
+	hp_num_label.add_theme_constant_override("outline_size", 4)
+	hp_bar.add_child(hp_num_label)
+	
+	vbox.add_child(hp_bar)
+	hp_viewport.add_child(vbox)
 	add_child(hp_viewport)
 	
 	hp_sprite = Sprite3D.new()
 	hp_sprite.texture = hp_viewport.get_texture()
 	hp_sprite.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	hp_sprite.position = Vector3(0, 3.2, 0) # Above the 2.5m troll
-	hp_sprite.pixel_size = 0.015
+	hp_sprite.position = Vector3(0, 3.2, 0)
+	hp_sprite.pixel_size = 0.012
 	add_child(hp_sprite)
+	
+	_status_label = Label3D.new()
+	_status_label.name = "StatusIcons"
+	_status_label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	_status_label.position = Vector3(0, 3.65, 0)
+	_status_label.pixel_size = 0.006
+	_status_label.no_depth_test = true
+	_status_label.render_priority = 15
+	_status_label.font_size = 72
+	_status_label.outline_size = 12
+	_status_label.outline_modulate = Color(0, 0, 0, 0.9)
+	_status_label.visible = false
+	add_child(_status_label)
 
 func _find_anim_player(node: Node) -> AnimationPlayer:
 	if node is AnimationPlayer:
@@ -248,7 +299,7 @@ func _process_aggro(delta: float, dist_to_player: float, dir_to_player: Vector3)
 		state = State.ATTACKING
 		_has_hit = false
 		_did_hit_player = false
-		_play_anim("Attack", 0.2, 1.3) # Increased attack speed
+		_play_anim("Attack", 0.2, 0.75) # Slowed heavy attack speed
 		return
 		
 	velocity.x = dir_to_player.x * run_speed * speed_modifier
@@ -275,8 +326,41 @@ func _on_health_changed(current: int, maximum: int) -> void:
 	if hp_bar:
 		hp_bar.max_value = maximum
 		hp_bar.value = current
+	if hp_num_label:
+		hp_num_label.text = "%d / %d HP" % [current, maximum]
 	if hp_viewport:
-		hp_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
+		hp_viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	if is_hovered or state != State.CIRCLING:
+		_update_target_hud()
+
+func _on_mouse_entered() -> void:
+	is_hovered = true
+	_update_target_hud()
+
+func _on_mouse_exited() -> void:
+	is_hovered = false
+	var hud := get_tree().get_first_node_in_group("HUD")
+	if hud and hud.has_method("hide_target_info"):
+		hud.hide_target_info()
+
+func _update_target_hud() -> void:
+	if not health: return
+	var hud := get_tree().get_first_node_in_group("HUD")
+	if hud and hud.has_method("show_target_info"):
+		hud.show_target_info(enemy_name, health.current_health, health.max_health)
+
+func _update_status_icons() -> void:
+	if not _status_label: return
+	if state == State.DYING:
+		_status_label.visible = false
+		return
+	var text := ""
+	if is_burning:
+		text += "🔥 "
+	if is_frozen:
+		text += "❄️ "
+	_status_label.text = text.strip_edges()
+	_status_label.visible = not text.is_empty()
 
 func _die() -> void:
 	if state == State.DYING:
@@ -297,6 +381,7 @@ func _die() -> void:
 	collision_layer = 0
 	if hp_sprite:
 		hp_sprite.visible = false
+	_update_status_icons()
 	_spawn_death_drop()
 	get_tree().create_timer(10.0).timeout.connect(_respawn)
 
@@ -309,6 +394,7 @@ func _respawn() -> void:
 	collision_layer = _active_collision_layer
 	if hp_sprite:
 		hp_sprite.visible = true
+	_update_status_icons()
 	_play_anim("Move")
 
 func _spawn_death_drop() -> void:
@@ -339,12 +425,14 @@ func apply_freeze(duration: float, potency: float) -> void:
 	is_frozen = true
 	speed_modifier = potency
 	_apply_material_overlay(freeze_mat)
+	_update_status_icons()
 	get_tree().create_timer(duration).timeout.connect(func():
 		if generation != _freeze_generation or state == State.DYING:
 			return
 		is_frozen = false
 		speed_modifier = 1.0
 		_apply_material_overlay(burn_mat if is_burning else null)
+		_update_status_icons()
 	)
 
 func apply_burn(duration: float = 3.0, damage_per_tick: int = 10) -> void:
@@ -353,6 +441,7 @@ func apply_burn(duration: float = 3.0, damage_per_tick: int = 10) -> void:
 	var generation := _burn_generation
 	is_burning = true
 	_apply_material_overlay(burn_mat)
+	_update_status_icons()
 	
 	var ticks = int(duration / 0.5)
 	for i in range(ticks):
@@ -368,3 +457,4 @@ func apply_burn(duration: float = 3.0, damage_per_tick: int = 10) -> void:
 			_apply_material_overlay(freeze_mat)
 		else:
 			_apply_material_overlay(null)
+		_update_status_icons()

@@ -125,9 +125,19 @@ func _on_new_game_button_pressed() -> void:
 	new_game_panel.visible = true
 	save_name_line_edit.grab_focus()
 
+const FAQ_SCENE = preload("res://scenes/faq_ui.tscn")
+var _faq_instance: CanvasLayer = null
+
 func _on_settings_button_pressed() -> void:
 	main_buttons_container.visible = false
 	settings_panel.visible = true
+
+func _on_faq_button_pressed() -> void:
+	if not _faq_instance:
+		_faq_instance = FAQ_SCENE.instantiate() as CanvasLayer
+		add_child(_faq_instance)
+	if _faq_instance.has_method("open"):
+		_faq_instance.call("open")
 
 func _on_quit_button_pressed() -> void:
 	get_tree().quit()

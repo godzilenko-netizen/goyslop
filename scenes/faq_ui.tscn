@@ -1,0 +1,232 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://scripts/faq_ui.gd" id="1_faq_script"]
+[ext_resource type="Theme" path="res://themes/diablo2_theme.tres" id="2_theme"]
+
+[sub_resource type="StyleBoxFlat" id="SB_outer"]
+bg_color = Color(0.025, 0.016, 0.013, 0.985)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.48, 0.34, 0.09, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+shadow_color = Color(0, 0, 0, 0.9)
+shadow_size = 24
+
+[sub_resource type="StyleBoxFlat" id="SB_inner"]
+bg_color = Color(0, 0, 0, 0)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.24, 0.17, 0.06, 0.8)
+
+[sub_resource type="StyleBoxFlat" id="SB_divider"]
+bg_color = Color(0.38, 0.26, 0.08, 0.75)
+
+[sub_resource type="StyleBoxFlat" id="SB_content_bg"]
+bg_color = Color(0.012, 0.008, 0.006, 0.92)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.28, 0.20, 0.08, 0.8)
+
+[sub_resource type="StyleBoxFlat" id="SB_tab_active"]
+bg_color = Color(0.18, 0.12, 0.05, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 0
+border_color = Color(0.68, 0.50, 0.14, 1)
+
+[sub_resource type="StyleBoxFlat" id="SB_tab_inactive"]
+bg_color = Color(0.05, 0.035, 0.02, 0.8)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.28, 0.20, 0.08, 0.6)
+
+[sub_resource type="StyleBoxFlat" id="SB_footer"]
+bg_color = Color(0.015, 0.01, 0.008, 0.95)
+border_width_top = 1
+border_color = Color(0.28, 0.20, 0.08, 0.8)
+
+[node name="FaqUI" type="CanvasLayer"]
+layer = 120
+process_mode = 3
+script = ExtResource("1_faq_script")
+
+[node name="RootPanel" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(660, 520)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -330.0
+offset_top = -260.0
+offset_right = 330.0
+offset_bottom = 260.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+theme_override_styles/panel = SubResource("SB_outer")
+
+[node name="InnerBorder" type="PanelContainer" parent="RootPanel"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_inner")
+
+[node name="OM" type="MarginContainer" parent="RootPanel/InnerBorder"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
+
+[node name="VBox" type="VBoxContainer" parent="RootPanel/InnerBorder/OM"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+; ── Title Bar ────────────────────────────────────────────────────────────────
+
+[node name="TitleBar" type="HBoxContainer" parent="RootPanel/InnerBorder/OM/VBox"]
+layout_mode = 2
+
+[node name="CornerL" type="Label" parent="RootPanel/InnerBorder/OM/VBox/TitleBar"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.44, 0.1, 1)
+theme_override_font_sizes/font_size = 14
+text = "✦"
+
+[node name="TitleText" type="Label" parent="RootPanel/InnerBorder/OM/VBox/TitleBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.82, 0.64, 0.2, 1)
+theme_override_font_sizes/font_size = 13
+text = "С П Р А В К А   И   F A Q"
+horizontal_alignment = 1
+
+[node name="CornerR" type="Label" parent="RootPanel/InnerBorder/OM/VBox/TitleBar"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.44, 0.1, 1)
+theme_override_font_sizes/font_size = 14
+text = "✦"
+
+[node name="CloseBtn" type="Button" parent="RootPanel/InnerBorder/OM/VBox/TitleBar"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.35, 0.26, 0.1, 0.85)
+theme_override_font_sizes/font_size = 13
+text = "  ×  "
+
+; ── Separator 1 ──────────────────────────────────────────────────────────────
+
+[node name="Sep1" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox"]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_divider")
+
+; ── Tab Row ──────────────────────────────────────────────────────────────────
+
+[node name="TabRow" type="HBoxContainer" parent="RootPanel/InnerBorder/OM/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TabAttributes" type="Button" parent="RootPanel/InnerBorder/OM/VBox/TabRow"]
+custom_minimum_size = Vector2(140, 32)
+layout_mode = 2
+theme_override_styles/normal = SubResource("SB_tab_active")
+theme_override_font_sizes/font_size = 10
+text = "А Т Р И Б У Т Ы"
+
+[node name="TabCombat" type="Button" parent="RootPanel/InnerBorder/OM/VBox/TabRow"]
+custom_minimum_size = Vector2(140, 32)
+layout_mode = 2
+theme_override_styles/normal = SubResource("SB_tab_inactive")
+theme_override_font_sizes/font_size = 10
+text = "У П Р А В Л Е Н И Е"
+
+[node name="TabInventory" type="Button" parent="RootPanel/InnerBorder/OM/VBox/TabRow"]
+custom_minimum_size = Vector2(140, 32)
+layout_mode = 2
+theme_override_styles/normal = SubResource("SB_tab_inactive")
+theme_override_font_sizes/font_size = 10
+text = "И Н В Е Н Т А Р Ь"
+
+[node name="TabItems" type="Button" parent="RootPanel/InnerBorder/OM/VBox/TabRow"]
+custom_minimum_size = Vector2(140, 32)
+layout_mode = 2
+theme_override_styles/normal = SubResource("SB_tab_inactive")
+theme_override_font_sizes/font_size = 10
+text = "П Р Е Д М Е Т Ы"
+
+; ── Content Panel ────────────────────────────────────────────────────────────
+
+[node name="ContentPanel" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("SB_content_bg")
+
+[node name="Margin" type="MarginContainer" parent="RootPanel/InnerBorder/OM/VBox/ContentPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="Scroll" type="ScrollContainer" parent="RootPanel/InnerBorder/OM/VBox/ContentPanel/Margin"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="ContentLabel" type="RichTextLabel" parent="RootPanel/InnerBorder/OM/VBox/ContentPanel/Margin/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_colors/default_color = Color(0.83, 0.76, 0.65, 1)
+theme_override_font_sizes/normal_font_size = 11
+theme_override_font_sizes/bold_font_size = 12
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+
+; ── Footer ────────────────────────────────────────────────────────────────────
+
+[node name="Footer" type="PanelContainer" parent="RootPanel/InnerBorder/OM/VBox"]
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+theme_override_styles/panel = SubResource("SB_footer")
+
+[node name="FM" type="MarginContainer" parent="RootPanel/InnerBorder/OM/VBox/Footer"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 4
+
+[node name="FHBox" type="HBoxContainer" parent="RootPanel/InnerBorder/OM/VBox/Footer/FM"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="KeyHintLbl" type="Label" parent="RootPanel/InnerBorder/OM/VBox/Footer/FM/FHBox"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.32, 0.24, 0.08, 0.6)
+theme_override_font_sizes/font_size = 10
+text = "[ F1 ]  Открыть / Закрыть Справку"
+
+[node name="FSpacer" type="Control" parent="RootPanel/InnerBorder/OM/VBox/Footer/FM/FHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="FooterCloseBtn" type="Button" parent="RootPanel/InnerBorder/OM/VBox/Footer/FM/FHBox"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.35, 0.26, 0.1, 0.9)
+theme_override_font_sizes/font_size = 10
+text = "[ З А К Р Ы Т Ь ]"

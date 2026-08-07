@@ -12,6 +12,22 @@ extends Resource
 @export var icon: Texture2D
 @export var icon_path: String = ""
 
+@export_group("Attribute Requirements")
+## Минимальная Сила для экипировки (0 = нет требования)
+@export var req_str: int = 0
+## Минимальная Ловкость для экипировки (0 = нет требования)
+@export var req_dex: int = 0
+## Минимальный Интеллект для экипировки (0 = нет требования)
+@export var req_int: int = 0
+
+@export_group("Attribute Scaling")
+## Масштабирование урона от Силы (0.0 = не масштабируется)
+@export var str_scaling: float = 0.0
+## Масштабирование урона от Ловкости
+@export var dex_scaling: float = 0.0
+## Масштабирование урона от Интеллекта
+@export var int_scaling: float = 0.0
+
 
 func to_inventory_item(quantity: int = 1) -> Dictionary:
 	var path_str := icon_path if not icon_path.is_empty() else (icon.resource_path if icon else "")
@@ -26,6 +42,14 @@ func to_inventory_item(quantity: int = 1) -> Dictionary:
 		"quantity": maxi(quantity, 1),
 		"max_stack": maxi(max_stack, 1),
 		"icon": path_str,
+		# Attribute requirements
+		"req_str": req_str,
+		"req_dex": req_dex,
+		"req_int": req_int,
+		# Attribute scaling coefficients
+		"str_scaling": str_scaling,
+		"dex_scaling": dex_scaling,
+		"int_scaling": int_scaling,
 	}
 
 
