@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="FlaskData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/flask_data.gd" id="1_data"]
+[ext_resource type="Texture2D" path="res://assets/ui/basic_flask_full.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_data")
+flask_id = &"mana"
+display_name = "Малая колба маны"
+resource_type = "mana"
+icon = ExtResource("2_icon")
+liquid_tint = Color(0.055, 0.32, 1, 1)
+max_charges = 3
+restore_amount = 25
+recharge_seconds = 8.0
+input_action = &"mana_flask"
+hotkey_label = "X"

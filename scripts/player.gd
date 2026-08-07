@@ -3,11 +3,16 @@ extends CharacterBody3D
 const ModelValidator = preload("res://scripts/model_validator.gd")
 const PROJECTILE_SCENE = preload("res://scenes/projectile.tscn")
 const SkillDataType = preload("res://scripts/data/skill_data.gd")
+const FlaskDataType = preload("res://scripts/data/flask_data.gd")
+const RefillableFlaskType = preload("res://scripts/components/refillable_flask.gd")
 const PlayerStatsType = preload("res://scripts/components/player_stats.gd")
 const GameHUDType = preload("res://scripts/hud.gd")
+const RetroMaterialStylerType = preload("res://scripts/retro_material_styler.gd")
 const BASIC_ATTACK_SKILL = preload("res://data/skills/basic_attack.tres")
 const FIREBALL_SKILL = preload("res://data/skills/fireball.tres")
 const ICE_ARROW_SKILL = preload("res://data/skills/ice_arrow.tres")
+const BASIC_HEALTH_FLASK = preload("res://data/flasks/basic_health_flask.tres")
+const BASIC_MANA_FLASK = preload("res://data/flasks/basic_mana_flask.tres")
 
 @export var walk_speed: float = 5.0
 @export var sprint_speed: float = 10.0
@@ -21,12 +26,16 @@ var current_speed: float = 5.0
 @export var basic_attack_skill: SkillDataType = BASIC_ATTACK_SKILL
 @export var fireball_skill: SkillDataType = FIREBALL_SKILL
 @export var ice_arrow_skill: SkillDataType = ICE_ARROW_SKILL
+@export var health_flask_data: FlaskDataType = BASIC_HEALTH_FLASK
+@export var mana_flask_data: FlaskDataType = BASIC_MANA_FLASK
 
 var is_attack_on_cooldown: bool = false
 var is_attacking: bool = false
 var mouse_target: Vector3 = Vector3.ZERO
 var is_casting: bool = false  # Р¤Р»Р°Рі Р±Р»РѕРєРёСЂРѕРІРєРё РІРѕ РІСЂРµРјСЏ РєР°СЃС‚Р°
 var _skill_cooldowns: Dictionary = {}
+var health_flask: RefillableFlaskType
+var mana_flask: RefillableFlaskType
 
 var is_dead: bool = false
 var is_knocked_down: bool = false
@@ -41,10 +50,12 @@ var _regen_timer: float = 0.0
 @onready var stats: PlayerStatsType = $PlayerStats
 @onready var hud: GameHUDType = $HUD
 @onready var inventory_ui: CanvasLayer = $InventoryUI
+@onready var mana_warning: Label3D = $ManaWarning
 
 var anim_player: AnimationPlayer = null
 var is_moving_backwards_state: bool = false
 static var _cached_animation_library: AnimationLibrary = null
+var _mana_warning_tween: Tween = null
 
 func _ready() -> void:
 	randomize()
@@ -64,10 +75,22 @@ func _ready() -> void:
 	stats.died.connect(_die)
 	var configured_skills: Array[SkillDataType] = [basic_attack_skill, fireball_skill, ice_arrow_skill]
 	hud.configure_skills(configured_skills)
+	var configured_flasks: Array[FlaskDataType] = [health_flask_data, mana_flask_data]
+	hud.configure_flasks(configured_flasks)
+	health_flask = RefillableFlaskType.new(health_flask_data)
+	mana_flask = RefillableFlaskType.new(mana_flask_data)
+	health_flask.changed.connect(hud.update_flask_state)
+	mana_flask.changed.connect(hud.update_flask_state)
+	hud.flask_requested.connect(_use_flask_by_id)
+	health_flask.emit_current_state()
+	mana_flask.emit_current_state()
 		
 	# Р Р°Р·РІРѕСЂРѕС‚ РјРѕРґРµР»Рё Р»РёС†РѕРј РІРїРµСЂРµРґ Рё Р°РІС‚Рѕ-РјР°СЃС€С‚Р°Р± 1.8Рј
 	if has_node("Visuals/CharacterModel"):
 		ModelValidator.auto_fit_model_size($Visuals/CharacterModel, 1.8)
+		RetroMaterialStylerType.apply_to_model(
+			$Visuals/CharacterModel, Color(0.62, 0.53, 0.38), 0.86
+		)
 		
 	_setup_mixamo_animations()
 	stats.emit_current_values()
@@ -153,6 +176,9 @@ func _find_anim_player(node: Node) -> AnimationPlayer:
 	return null
 
 func _physics_process(delta: float) -> void:
+	if not is_dead:
+		health_flask.tick(delta)
+		mana_flask.tick(delta)
 	if is_dead:
 		velocity.x = move_toward(velocity.x, 0, friction * delta)
 		velocity.z = move_toward(velocity.z, 0, friction * delta)
@@ -269,9 +295,17 @@ func _update_animations(direction: Vector3, is_sprinting: bool) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if is_dead or is_knocked_down: return
+	if event.is_action_pressed("health_flask"):
+		use_health_flask()
+		return
+	if event.is_action_pressed("mana_flask"):
+		use_mana_flask()
+		return
 	if inventory_ui and inventory_ui.get("is_open") == true:
 		return
 	if event.is_action_pressed("attack"):
+		if _try_pickup_world_loot():
+			return
 		attack()
 	elif event.is_action_pressed("skill_2"):
 		cast_fireball()
@@ -331,11 +365,57 @@ func restore_health(amount: int) -> int:
 func restore_health_to_full() -> int:
 	return stats.restore_health_to_full()
 
+
+func use_health_flask() -> bool:
+	return _use_flask(health_flask)
+
+
+func use_mana_flask() -> bool:
+	return _use_flask(mana_flask)
+
+
+func _use_flask_by_id(flask_id: StringName) -> void:
+	match flask_id:
+		&"health": use_health_flask()
+		&"mana": use_mana_flask()
+
+
+func _use_flask(flask: RefillableFlaskType) -> bool:
+	if not flask or not flask.data or flask.charges <= 0:
+		if flask and flask.data:
+			hud.flash_flask_unavailable(flask.data.flask_id)
+		return false
+
+	var restored := 0
+	match flask.data.resource_type:
+		"health":
+			if stats.current_hp >= stats.max_hp:
+				hud.flash_flask_unavailable(flask.data.flask_id)
+				return false
+			restored = stats.restore_health(flask.data.restore_amount)
+		"mana":
+			if stats.current_energy >= stats.max_energy:
+				hud.flash_flask_unavailable(flask.data.flask_id)
+				return false
+			restored = stats.restore_energy(flask.data.restore_amount)
+		_:
+			return false
+
+	if restored <= 0:
+		return false
+	flask.consume()
+	return true
+
 func restore_energy(amount: int) -> int:
 	return stats.restore_energy(amount)
 
 func restore_energy_to_full() -> int:
 	return stats.restore_energy_to_full()
+
+func add_inventory_item(item: Dictionary) -> bool:
+	if not inventory_ui or not inventory_ui.has_method("add_item"):
+		return false
+	return inventory_ui.add_item(item)
 
 # --- РЎР›РЈР§РђР™РќР«Р™ Р’Р«Р‘РћР  РђРќРРњРђР¦РР РР— Р”Р’РЈРҐ РЈР”РђР РћР’ KРЈР›РђРљРћРњ ---
 func attack() -> void:
@@ -382,6 +462,27 @@ func attack() -> void:
 
 func interact() -> void:
 	print("Р’Р·Р°РёРјРѕРґРµР№СЃС‚РІРёРµ!")
+
+func _try_pickup_world_loot() -> bool:
+	return _try_pickup_world_loot_at(get_viewport().get_mouse_position())
+
+func _try_pickup_world_loot_at(mouse_position: Vector2) -> bool:
+	if not camera or not get_world_3d():
+		return false
+	var ray_origin := camera.project_ray_origin(mouse_position)
+	var ray_direction := camera.project_ray_normal(mouse_position)
+	var query := PhysicsRayQueryParameters3D.create(
+		ray_origin, ray_origin + ray_direction * 100.0, 8
+	)
+	query.collide_with_areas = true
+	query.collide_with_bodies = false
+	var hit := get_world_3d().direct_space_state.intersect_ray(query)
+	if hit.is_empty():
+		return false
+	var collider := hit.get("collider") as Node
+	if collider and collider.is_in_group("WorldLoot") and collider.has_method("try_pickup"):
+		return bool(collider.try_pickup())
+	return false
 
 func _warmup_skill_cache() -> void:
 	var effect_types = ["fire", "ice", "generic"]
@@ -480,6 +581,7 @@ func _cast_projectile_skill(skill: SkillDataType) -> void:
 		return
 	if not stats.spend_energy(skill.mana_cost):
 		print("Not enough mana: ", stats.current_energy, "/", skill.mana_cost)
+		_show_mana_warning()
 		return
 
 	is_casting = true
@@ -502,3 +604,22 @@ func _cast_projectile_skill(skill: SkillDataType) -> void:
 	_spawn_projectile(_get_fire_direction(), skill)
 	print(skill.display_name, " launched")
 	is_casting = false
+
+func _show_mana_warning() -> void:
+	if not mana_warning:
+		return
+	if _mana_warning_tween and _mana_warning_tween.is_valid():
+		_mana_warning_tween.kill()
+
+	mana_warning.position = Vector3(0.0, 2.35, 0.0)
+	mana_warning.modulate = Color(1.0, 0.22, 0.12, 1.0)
+	mana_warning.visible = true
+
+	_mana_warning_tween = create_tween().set_parallel(true)
+	_mana_warning_tween.tween_property(
+		mana_warning, "position", Vector3(0.0, 2.75, 0.0), 1.05
+	).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_mana_warning_tween.tween_property(
+		mana_warning, "modulate:a", 0.0, 0.65
+	).set_delay(0.35).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	_mana_warning_tween.chain().tween_callback(func(): mana_warning.visible = false)

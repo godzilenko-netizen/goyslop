@@ -132,10 +132,13 @@ func _process_icon(options: Dictionary) -> int:
 			return ERR_INVALID_DATA
 		image = image.get_region(alpha_bounds)
 
-	var output_size := int(options.get("size", DEFAULT_SIZE))
+	var square_size := int(options.get("size", DEFAULT_SIZE))
+	var output_width := int(options.get("width", square_size))
+	var output_height := int(options.get("height", square_size))
 	var padding := int(options.get("padding", 0))
-	if output_size <= 0 or padding < 0 or padding * 2 >= output_size:
-		push_error("Invalid size/padding combination: size=%d padding=%d" % [output_size, padding])
+	if output_width <= 0 or output_height <= 0 or padding < 0 \
+	or padding * 2 >= output_width or padding * 2 >= output_height:
+		push_error("Invalid dimensions/padding: %dx%d padding=%d" % [output_width, output_height, padding])
 		return ERR_INVALID_PARAMETER
 
 	var mode := str(options.get("mode", DEFAULT_MODE)).to_lower()
@@ -149,7 +152,8 @@ func _process_icon(options: Dictionary) -> int:
 		return ERR_INVALID_PARAMETER
 
 	var background := Color.from_string(str(options.get("background", "#00000000")), Color(0, 0, 0, 0))
-	var final_image := _fit_square(image, output_size, padding, mode, interpolation, background)
+	var output_dimensions := Vector2i(output_width, output_height)
+	var final_image := _fit_rect(image, output_dimensions, padding, mode, interpolation, background)
 	var absolute_output := ProjectSettings.globalize_path(output_path) if output_path.begins_with("res://") else output_path
 	var output_directory := absolute_output.get_base_dir()
 	var mkdir_error := DirAccess.make_dir_recursive_absolute(output_directory)
@@ -166,8 +170,8 @@ func _process_icon(options: Dictionary) -> int:
 		str(decoded["format"]),
 		int(decoded["offset"]),
 		output_path,
-		output_size,
-		output_size,
+		output_width,
+		output_height,
 		mode,
 		filter_name,
 	])
@@ -275,32 +279,32 @@ func _find_alpha_bounds(image: Image, threshold: int) -> Rect2i:
 	return Rect2i(min_x, min_y, max_x - min_x + 1, max_y - min_y + 1)
 
 
-func _fit_square(source: Image, output_size: int, padding: int, mode: String, interpolation: int, background: Color) -> Image:
-	var inner_size := output_size - padding * 2
+func _fit_rect(source: Image, output_size: Vector2i, padding: int, mode: String, interpolation: int, background: Color) -> Image:
+	var inner_size := output_size - Vector2i.ONE * padding * 2
 	var working := source.duplicate()
 	working.convert(Image.FORMAT_RGBA8)
 
 	if mode == "stretch":
-		working.resize(inner_size, inner_size, interpolation)
+		working.resize(inner_size.x, inner_size.y, interpolation)
 	elif mode == "cover":
-		var scale: float = max(float(inner_size) / working.get_width(), float(inner_size) / working.get_height())
-		var resized_width: int = max(int(round(working.get_width() * scale)), inner_size)
-		var resized_height: int = max(int(round(working.get_height() * scale)), inner_size)
+		var scale: float = max(float(inner_size.x) / working.get_width(), float(inner_size.y) / working.get_height())
+		var resized_width: int = max(int(round(working.get_width() * scale)), inner_size.x)
+		var resized_height: int = max(int(round(working.get_height() * scale)), inner_size.y)
 		working.resize(resized_width, resized_height, interpolation)
-		var crop_x: int = max(int((resized_width - inner_size) / 2.0), 0)
-		var crop_y: int = max(int((resized_height - inner_size) / 2.0), 0)
-		working = working.get_region(Rect2i(crop_x, crop_y, inner_size, inner_size))
+		var crop_x: int = max(int((resized_width - inner_size.x) / 2.0), 0)
+		var crop_y: int = max(int((resized_height - inner_size.y) / 2.0), 0)
+		working = working.get_region(Rect2i(crop_x, crop_y, inner_size.x, inner_size.y))
 	else:
-		var scale: float = min(float(inner_size) / working.get_width(), float(inner_size) / working.get_height())
+		var scale: float = min(float(inner_size.x) / working.get_width(), float(inner_size.y) / working.get_height())
 		var resized_width: int = max(int(round(working.get_width() * scale)), 1)
 		var resized_height: int = max(int(round(working.get_height() * scale)), 1)
 		working.resize(resized_width, resized_height, interpolation)
 
-	var canvas := Image.create(output_size, output_size, false, Image.FORMAT_RGBA8)
+	var canvas := Image.create(output_size.x, output_size.y, false, Image.FORMAT_RGBA8)
 	canvas.fill(background)
 	var destination := Vector2i(
-		padding + (inner_size - working.get_width()) / 2,
-		padding + (inner_size - working.get_height()) / 2
+		padding + (inner_size.x - working.get_width()) / 2,
+		padding + (inner_size.y - working.get_height()) / 2
 	)
 	canvas.blit_rect(working, Rect2i(Vector2i.ZERO, working.get_size()), destination)
 	return canvas
@@ -347,13 +351,14 @@ func _run_self_test() -> int:
 	var result := _process_icon({
 		"input": input_path,
 		"output": output_path,
-		"size": 32,
+		"width": 48,
+		"height": 32,
 		"mode": "contain",
 		"filter": "nearest",
 		"background": "#00000000",
 	})
 	var normalized := Image.load_from_file(output_path) if result == OK else null
-	var passed := normalized != null and not normalized.is_empty() and normalized.get_size() == Vector2i(32, 32)
+	var passed := normalized != null and not normalized.is_empty() and normalized.get_size() == Vector2i(48, 32)
 
 	DirAccess.remove_absolute(input_path)
 	DirAccess.remove_absolute(output_path)
@@ -382,6 +387,8 @@ Self-test:
 
 Options:
   --size 128
+  --width 128
+  --height 128
   --padding 0
   --mode cover|contain|stretch
   --filter nearest|bilinear|cubic|trilinear|lanczos
@@ -392,5 +399,6 @@ Options:
 
 The input extension is ignored when necessary. PNG, WebP, and JPEG are
 detected by their byte signatures, including data with a junk prefix.
+Use --size for square output or --width/--height for rectangular assets.
 The output is always a normalized RGBA PNG for reliable Godot imports.
 """)

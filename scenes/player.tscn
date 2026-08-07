@@ -46,6 +46,19 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, -1.2)
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Visuals/AttackHitbox"]
 shape = SubResource("BoxShape3D_hitbox")
 
+[node name="ManaWarning" type="Label3D" parent="."]
+visible = false
+position = Vector3(0, 2.35, 0)
+billboard = 1
+no_depth_test = true
+fixed_size = true
+modulate = Color(1, 0.22, 0.12, 1)
+outline_modulate = Color(0.18, 0.01, 0, 0.95)
+text = "НЕДОСТАТОЧНО МАНЫ"
+pixel_size = 0.0013
+font_size = 18
+outline_size = 4
+
 [node name="CameraPivot" type="Node3D" parent="."]
 
 [node name="SpringArm3D" type="SpringArm3D" parent="CameraPivot"]

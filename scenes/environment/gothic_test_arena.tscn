@@ -1,0 +1,125 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="Material" path="res://materials/gothic_floor.tres" id="1_floor_mat"]
+[ext_resource type="PackedScene" path="res://scenes/environment/gothic_wall_segment.tscn" id="2_wall"]
+[ext_resource type="PackedScene" path="res://scenes/environment/gothic_arch.tscn" id="3_arch"]
+[ext_resource type="PackedScene" path="res://scenes/environment/gothic_column.tscn" id="4_column"]
+[ext_resource type="PackedScene" path="res://scenes/environment/gothic_fence.tscn" id="5_fence"]
+[ext_resource type="PackedScene" path="res://scenes/environment/gothic_brazier.tscn" id="6_brazier"]
+[ext_resource type="PackedScene" path="res://scenes/environment/gothic_gravestone.tscn" id="7_grave"]
+
+[sub_resource type="BoxMesh" id="Mesh_floor"]
+material = ExtResource("1_floor_mat")
+size = Vector3(32, 0.35, 32)
+
+[sub_resource type="BoxShape3D" id="Shape_floor"]
+size = Vector3(32, 0.35, 32)
+
+[sub_resource type="StandardMaterial3D" id="Mat_border"]
+albedo_color = Color(0.055, 0.065, 0.06, 1)
+roughness = 1.0
+
+[sub_resource type="BoxMesh" id="Mesh_border"]
+material = SubResource("Mat_border")
+size = Vector3(34, 0.18, 1.2)
+
+[node name="GothicTestArena" type="Node3D"]
+
+[node name="Floor" type="StaticBody3D" parent="."]
+position = Vector3(0, -0.175, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor"]
+mesh = SubResource("Mesh_floor")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor"]
+shape = SubResource("Shape_floor")
+
+[node name="NorthVoidBorder" type="MeshInstance3D" parent="."]
+position = Vector3(0, -0.06, -16.4)
+mesh = SubResource("Mesh_border")
+
+[node name="SouthVoidBorder" type="MeshInstance3D" parent="."]
+position = Vector3(0, -0.06, 16.4)
+mesh = SubResource("Mesh_border")
+
+[node name="NorthArch" parent="." instance=ExtResource("3_arch")]
+position = Vector3(0, 0, -12)
+
+[node name="NorthWallL1" parent="." instance=ExtResource("2_wall")]
+position = Vector3(-4, 0, -12)
+
+[node name="NorthWallL2" parent="." instance=ExtResource("2_wall")]
+position = Vector3(-8, 0, -12)
+
+[node name="NorthWallR1" parent="." instance=ExtResource("2_wall")]
+position = Vector3(4, 0, -12)
+
+[node name="NorthWallR2" parent="." instance=ExtResource("2_wall")]
+position = Vector3(8, 0, -12)
+
+[node name="WestWall1" parent="." instance=ExtResource("2_wall")]
+position = Vector3(-12, 0, -8)
+rotation = Vector3(0, 1.5708, 0)
+
+[node name="WestWall2" parent="." instance=ExtResource("2_wall")]
+position = Vector3(-12, 0, -4)
+rotation = Vector3(0, 1.5708, 0)
+
+[node name="WestWall3" parent="." instance=ExtResource("2_wall")]
+position = Vector3(-12, 0, 0)
+rotation = Vector3(0, 1.5708, 0)
+
+[node name="WestWall4" parent="." instance=ExtResource("2_wall")]
+position = Vector3(-12, 0, 4)
+rotation = Vector3(0, 1.5708, 0)
+
+[node name="EastWall1" parent="." instance=ExtResource("2_wall")]
+position = Vector3(12, 0, -8)
+rotation = Vector3(0, 1.5708, 0)
+
+[node name="EastWall2" parent="." instance=ExtResource("2_wall")]
+position = Vector3(12, 0, -4)
+rotation = Vector3(0, 1.5708, 0)
+
+[node name="EastBrokenWall" parent="." instance=ExtResource("2_wall")]
+position = Vector3(12, -0.65, 4)
+rotation = Vector3(0.12, 1.5708, -0.06)
+
+[node name="ArchColumnLeft" parent="." instance=ExtResource("4_column")]
+position = Vector3(-3.15, 0, -11.35)
+
+[node name="ArchColumnRight" parent="." instance=ExtResource("4_column")]
+position = Vector3(3.15, 0, -11.35)
+
+[node name="RuinColumnLeft" parent="." instance=ExtResource("4_column")]
+position = Vector3(-8, 0, 6.5)
+
+[node name="RuinColumnRight" parent="." instance=ExtResource("4_column")]
+position = Vector3(8.5, -0.7, 1.8)
+rotation = Vector3(0.08, 0, 1.22)
+
+[node name="NorthBrazierLeft" parent="." instance=ExtResource("6_brazier")]
+position = Vector3(-2.5, 0, -9.3)
+
+[node name="NorthBrazierRight" parent="." instance=ExtResource("6_brazier")]
+position = Vector3(2.5, 0, -9.3)
+
+[node name="WestFence" parent="." instance=ExtResource("5_fence")]
+position = Vector3(-9.8, 0, 8.5)
+rotation = Vector3(0, 1.5708, 0)
+
+[node name="SouthFence" parent="." instance=ExtResource("5_fence")]
+position = Vector3(7.5, 0, 10.5)
+
+[node name="Gravestone1" parent="." instance=ExtResource("7_grave")]
+position = Vector3(6.4, 0, 6.6)
+rotation = Vector3(0, -0.24, 0)
+
+[node name="Gravestone2" parent="." instance=ExtResource("7_grave")]
+position = Vector3(8.0, 0, 7.6)
+rotation = Vector3(0, 0.16, 0)
+
+[node name="Gravestone3" parent="." instance=ExtResource("7_grave")]
+position = Vector3(9.3, 0, 5.8)
+rotation = Vector3(0, -0.38, 0)
+scale = Vector3(0.84, 0.84, 0.84)

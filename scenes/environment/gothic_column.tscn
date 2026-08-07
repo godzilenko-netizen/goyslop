@@ -1,0 +1,51 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Material" path="res://materials/gothic_wall.tres" id="1_wall"]
+
+[sub_resource type="CylinderMesh" id="Mesh_base"]
+material = ExtResource("1_wall")
+top_radius = 0.56
+bottom_radius = 0.68
+height = 0.38
+radial_segments = 8
+rings = 1
+
+[sub_resource type="CylinderMesh" id="Mesh_shaft"]
+material = ExtResource("1_wall")
+top_radius = 0.36
+bottom_radius = 0.44
+height = 2.35
+radial_segments = 8
+rings = 1
+
+[sub_resource type="CylinderMesh" id="Mesh_capital"]
+material = ExtResource("1_wall")
+top_radius = 0.68
+bottom_radius = 0.48
+height = 0.42
+radial_segments = 8
+rings = 1
+
+[sub_resource type="CylinderShape3D" id="Shape_column"]
+radius = 0.48
+height = 2.9
+
+[node name="GothicColumn" type="StaticBody3D"]
+collision_layer = 1
+collision_mask = 1
+
+[node name="Base" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.19, 0)
+mesh = SubResource("Mesh_base")
+
+[node name="Shaft" type="MeshInstance3D" parent="."]
+position = Vector3(0, 1.48, 0)
+mesh = SubResource("Mesh_shaft")
+
+[node name="Capital" type="MeshInstance3D" parent="."]
+position = Vector3(0, 2.86, 0)
+mesh = SubResource("Mesh_capital")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+position = Vector3(0, 1.45, 0)
+shape = SubResource("Shape_column")

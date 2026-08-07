@@ -274,8 +274,44 @@ text = "ЛКМ"
 [node name="CooldownOverlay" type="ColorRect" parent="Control/BottomCenterPanel/HotbarContainer/Slot1"]
 visible = false
 layout_mode = 2
+clip_contents = true
 mouse_filter = 2
-color = Color(0, 0, 0, 0.75)
+color = Color(0, 0, 0, 0)
+
+[node name="Shade" type="ColorRect" parent="Control/BottomCenterPanel/HotbarContainer/Slot1/CooldownOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.01, 0.02, 0.04, 0.78)
+
+[node name="Sweep" type="ColorRect" parent="Control/BottomCenterPanel/HotbarContainer/Slot1/CooldownOverlay"]
+layout_mode = 1
+anchor_right = 1.0
+offset_top = -1.0
+offset_bottom = 1.0
+grow_horizontal = 2
+mouse_filter = 2
+color = Color(1, 0.69, 0.18, 0.92)
+
+[node name="Timer" type="Label" parent="Control/BottomCenterPanel/HotbarContainer/Slot1/CooldownOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.94, 0.76, 1)
+theme_override_colors/font_outline_color = Color(0.03, 0.02, 0.01, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 12
+text = "0.000"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="Slot2" type="PanelContainer" parent="Control/BottomCenterPanel/HotbarContainer"]
 custom_minimum_size = Vector2(54, 54)
@@ -302,8 +338,44 @@ text = "2"
 [node name="CooldownOverlay" type="ColorRect" parent="Control/BottomCenterPanel/HotbarContainer/Slot2"]
 visible = false
 layout_mode = 2
+clip_contents = true
 mouse_filter = 2
-color = Color(0, 0, 0, 0.75)
+color = Color(0, 0, 0, 0)
+
+[node name="Shade" type="ColorRect" parent="Control/BottomCenterPanel/HotbarContainer/Slot2/CooldownOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.01, 0.02, 0.04, 0.78)
+
+[node name="Sweep" type="ColorRect" parent="Control/BottomCenterPanel/HotbarContainer/Slot2/CooldownOverlay"]
+layout_mode = 1
+anchor_right = 1.0
+offset_top = -1.0
+offset_bottom = 1.0
+grow_horizontal = 2
+mouse_filter = 2
+color = Color(1, 0.69, 0.18, 0.92)
+
+[node name="Timer" type="Label" parent="Control/BottomCenterPanel/HotbarContainer/Slot2/CooldownOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.94, 0.76, 1)
+theme_override_colors/font_outline_color = Color(0.03, 0.02, 0.01, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 12
+text = "0.000"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="Slot3" type="PanelContainer" parent="Control/BottomCenterPanel/HotbarContainer"]
 custom_minimum_size = Vector2(54, 54)
@@ -326,6 +398,48 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 4
 theme_override_font_sizes/font_size = 9
 text = "3"
+
+[node name="CooldownOverlay" type="ColorRect" parent="Control/BottomCenterPanel/HotbarContainer/Slot3"]
+visible = false
+layout_mode = 2
+clip_contents = true
+mouse_filter = 2
+color = Color(0, 0, 0, 0)
+
+[node name="Shade" type="ColorRect" parent="Control/BottomCenterPanel/HotbarContainer/Slot3/CooldownOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.01, 0.02, 0.04, 0.78)
+
+[node name="Sweep" type="ColorRect" parent="Control/BottomCenterPanel/HotbarContainer/Slot3/CooldownOverlay"]
+layout_mode = 1
+anchor_right = 1.0
+offset_top = -1.0
+offset_bottom = 1.0
+grow_horizontal = 2
+mouse_filter = 2
+color = Color(1, 0.69, 0.18, 0.92)
+
+[node name="Timer" type="Label" parent="Control/BottomCenterPanel/HotbarContainer/Slot3/CooldownOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.94, 0.76, 1)
+theme_override_colors/font_outline_color = Color(0.03, 0.02, 0.01, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 12
+text = "0.000"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="Slot4" type="PanelContainer" parent="Control/BottomCenterPanel/HotbarContainer"]
 custom_minimum_size = Vector2(54, 54)

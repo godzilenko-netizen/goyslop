@@ -1,0 +1,83 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://scripts/world_item_drop.gd" id="1_script"]
+[ext_resource type="Resource" path="res://data/items/leather_armor.tres" id="2_item"]
+
+[sub_resource type="SphereShape3D" id="SphereShape_drop"]
+radius = 0.5
+
+[sub_resource type="StandardMaterial3D" id="Material_cube"]
+albedo_color = Color(0.28, 0.29, 0.31, 1)
+metallic = 0.15
+roughness = 0.82
+emission_enabled = true
+emission = Color(0.20, 0.21, 0.23, 1)
+emission_energy_multiplier = 0.65
+
+[sub_resource type="BoxMesh" id="BoxMesh_cube"]
+material = SubResource("Material_cube")
+size = Vector3(0.22, 0.22, 0.22)
+
+[sub_resource type="StandardMaterial3D" id="Material_glow"]
+transparency = 1
+albedo_color = Color(0.42, 0.43, 0.46, 0.20)
+emission_enabled = true
+emission = Color(0.38, 0.40, 0.43, 1)
+emission_energy_multiplier = 0.9
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_glow"]
+material = SubResource("Material_glow")
+top_radius = 0.36
+bottom_radius = 0.36
+height = 0.015
+radial_segments = 24
+
+[sub_resource type="StandardMaterial3D" id="Material_beam"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.66, 0.68, 0.72, 0.22)
+emission_enabled = true
+emission = Color(0.54, 0.56, 0.60, 1)
+emission_energy_multiplier = 1.15
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_beam"]
+material = SubResource("Material_beam")
+top_radius = 0.018
+bottom_radius = 0.032
+height = 0.68
+radial_segments = 12
+
+[node name="WorldItemDrop" type="Area3D"]
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("1_script")
+item_data = ExtResource("2_item")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0.32, 0)
+shape = SubResource("SphereShape_drop")
+
+[node name="Glow" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.015, 0)
+mesh = SubResource("CylinderMesh_glow")
+
+[node name="Cube" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.16, 0)
+mesh = SubResource("BoxMesh_cube")
+
+[node name="Beam" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.58, 0)
+mesh = SubResource("CylinderMesh_beam")
+
+[node name="ItemLabel" type="Label3D" parent="."]
+visible = false
+position = Vector3(0, 1.02, 0)
+billboard = 1
+no_depth_test = true
+fixed_size = true
+pixel_size = 0.001
+modulate = Color(0.78, 0.78, 0.80, 1)
+outline_modulate = Color(0.02, 0.02, 0.025, 0.98)
+font_size = 15
+outline_size = 4
+horizontal_alignment = 1

@@ -129,8 +129,8 @@ func _build_fireball_model() -> void:
 	var core_mesh := SphereMesh.new()
 	core_mesh.radius = 0.23
 	core_mesh.height = 0.46
-	core_mesh.radial_segments = 16
-	core_mesh.rings = 8
+	core_mesh.radial_segments = 8
+	core_mesh.rings = 4
 	_add_visual_mesh(
 		core_mesh,
 		_make_glowing_material(
@@ -146,8 +146,8 @@ func _build_fireball_model() -> void:
 	var shell_mesh := SphereMesh.new()
 	shell_mesh.radius = 0.31
 	shell_mesh.height = 0.62
-	shell_mesh.radial_segments = 12
-	shell_mesh.rings = 6
+	shell_mesh.radial_segments = 8
+	shell_mesh.rings = 4
 	_add_visual_mesh(
 		shell_mesh,
 		_make_glowing_material(
@@ -314,8 +314,8 @@ func _setup_fire_trail() -> void:
 	process.turbulence_influence_max = 0.42
 
 	_trail.process_material = process
-	_trail.draw_pass_1 = _make_particle_sphere(0.12, 0.24, true)
-	_trail.amount = 96
+	_trail.draw_pass_1 = _make_particle_sphere(0.14, 0.28, true)
+	_trail.amount = 32
 	_trail.lifetime = 0.65
 	_trail.randomness = 0.35
 	_trail.local_coords = false
@@ -350,8 +350,8 @@ func _setup_fire_trail() -> void:
 	ember_process.emission_sphere_radius = 0.12
 
 	_detail_trail.process_material = ember_process
-	_detail_trail.draw_pass_1 = _make_particle_sphere(0.025, 0.05, true)
-	_detail_trail.amount = 42
+	_detail_trail.draw_pass_1 = _make_particle_sphere(0.035, 0.07, true)
+	_detail_trail.amount = 14
 	_detail_trail.lifetime = 0.85
 	_detail_trail.randomness = 0.55
 	_detail_trail.local_coords = false
@@ -388,8 +388,8 @@ func _setup_ice_trail() -> void:
 	frost_process.emission_sphere_radius = 0.09
 
 	_trail.process_material = frost_process
-	_trail.draw_pass_1 = _make_particle_sphere(0.075, 0.15, true)
-	_trail.amount = 72
+	_trail.draw_pass_1 = _make_particle_sphere(0.09, 0.18, true)
+	_trail.amount = 28
 	_trail.lifetime = 0.72
 	_trail.randomness = 0.4
 	_trail.local_coords = false
@@ -428,7 +428,7 @@ func _setup_ice_trail() -> void:
 
 	_detail_trail.process_material = shard_process
 	_detail_trail.draw_pass_1 = _make_ice_shard_mesh()
-	_detail_trail.amount = 34
+	_detail_trail.amount = 14
 	_detail_trail.lifetime = 0.82
 	_detail_trail.randomness = 0.5
 	_detail_trail.local_coords = false
@@ -555,7 +555,7 @@ func _make_particle_sphere(radius: float, height: float, unshaded: bool) -> Sphe
 
 func _make_ice_shard_mesh() -> BoxMesh:
 	var mesh := BoxMesh.new()
-	mesh.size = Vector3(0.045, 0.045, 0.16)
+	mesh.size = Vector3(0.06, 0.06, 0.19)
 	mesh.material = _make_particle_material(true)
 	return mesh
 
@@ -695,6 +695,8 @@ func _spawn_fireball_explosion_visuals(hit_pos: Vector3) -> void:
 	var sphere := SphereMesh.new()
 	sphere.radius = 0.3
 	sphere.height = 0.6
+	sphere.radial_segments = 8
+	sphere.rings = 4
 	blast_mesh.mesh = sphere
 	
 	var blast_mat := StandardMaterial3D.new()
@@ -723,7 +725,7 @@ func _spawn_fireball_explosion_visuals(hit_pos: Vector3) -> void:
 	var burst := GPUParticles3D.new()
 	burst.one_shot = true
 	burst.explosiveness = 0.95
-	burst.amount = 64
+	burst.amount = 22
 	burst.lifetime = 0.65
 	burst.local_coords = false
 	
@@ -740,7 +742,7 @@ func _spawn_fireball_explosion_visuals(hit_pos: Vector3) -> void:
 	
 	var proc := _make_particle_process(fire_grad, size_curv, Vector3.UP, 180.0, 3.5, 8.0, Vector3(0, 1.5, 0), 0.4, 1.2)
 	burst.process_material = proc
-	burst.draw_pass_1 = _make_particle_sphere(0.06, 0.12, true)
+	burst.draw_pass_1 = _make_particle_sphere(0.085, 0.17, true)
 	
 	world.add_child(burst)
 	burst.global_position = hit_pos
@@ -766,7 +768,7 @@ func _spawn_ice_shatter_visuals(hit_pos: Vector3) -> void:
 	var burst := GPUParticles3D.new()
 	burst.one_shot = true
 	burst.explosiveness = 0.98
-	burst.amount = 54
+	burst.amount = 18
 	burst.lifetime = 0.7
 	burst.local_coords = false
 

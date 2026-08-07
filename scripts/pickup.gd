@@ -15,18 +15,18 @@ func _ready() -> void:
 	# Configure visual based on type
 	var mat = StandardMaterial3D.new()
 	mat.emission_enabled = true
-	mat.emission_energy_multiplier = 3.0
-	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	mat.albedo_color = Color(1, 1, 1, 0.8)
+	mat.emission_energy_multiplier = 1.8
+	mat.roughness = 0.72
+	mat.albedo_color = Color(1, 1, 1, 1)
 	
 	if type == "Health":
-		mat.albedo_color = Color(1.0, 0.2, 0.2, 0.8)
-		mat.emission = Color(1.0, 0.1, 0.1)
-		$Particles.process_material.color = Color(1.0, 0.2, 0.2)
+		mat.albedo_color = Color(0.62, 0.055, 0.045, 1)
+		mat.emission = Color(0.82, 0.045, 0.025)
+		$Particles.process_material.color = Color(0.72, 0.08, 0.06)
 	else:
-		mat.albedo_color = Color(0.2, 0.4, 1.0, 0.8)
-		mat.emission = Color(0.1, 0.3, 1.0)
-		$Particles.process_material.color = Color(0.2, 0.4, 1.0)
+		mat.albedo_color = Color(0.055, 0.23, 0.52, 1)
+		mat.emission = Color(0.035, 0.24, 0.72)
+		$Particles.process_material.color = Color(0.08, 0.32, 0.75)
 		
 	if $MeshInstance3D:
 		$MeshInstance3D.material_override = mat

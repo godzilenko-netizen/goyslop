@@ -2,10 +2,13 @@ extends CharacterBody3D
 
 const ModelValidatorType = preload("res://scripts/model_validator.gd")
 const HealthComponentType = preload("res://scripts/components/health_component.gd")
+const RetroMaterialStylerType = preload("res://scripts/retro_material_styler.gd")
 const TROLL_MODEL_SCENE = preload("res://models/troll/Troll.fbx")
 const TROLL_MOVE_SCENE = preload("res://models/troll/Capoeira.fbx")
 const TROLL_ATTACK_SCENE = preload("res://models/troll/Baseball Hit.fbx")
 const TROLL_DEATH_SCENE = preload("res://models/troll/Dying.fbx")
+const WORLD_ITEM_DROP_SCENE = preload("res://scenes/world_item_drop.tscn")
+const LEATHER_ARMOR_DATA = preload("res://data/items/leather_armor.tres")
 
 enum State { CIRCLING, AGGRO, ATTACKING, WAITING, DYING }
 
@@ -15,6 +18,8 @@ enum State { CIRCLING, AGGRO, ATTACKING, WAITING, DYING }
 @export var aggro_range: float = 7.0
 @export var attack_range: float = 2.5
 @export var attack_damage: int = 40
+@export_range(0.0, 20.0, 0.1) var knockback_horizontal_force: float = 5.0
+@export_range(0.0, 20.0, 0.1) var knockback_vertical_force: float = 4.0
 
 var state: State = State.CIRCLING
 var anim_player: AnimationPlayer = null
@@ -35,6 +40,8 @@ var _has_hit: bool = false
 var _did_hit_player: bool = false
 var _freeze_generation := 0
 var _burn_generation := 0
+var _active_collision_layer: int = 1
+var _aggro_armed := true
 
 var freeze_mat: StandardMaterial3D
 var burn_mat: StandardMaterial3D
@@ -42,6 +49,7 @@ var burn_mat: StandardMaterial3D
 
 func _ready() -> void:
 	add_to_group("Enemies")
+	_active_collision_layer = collision_layer
 	player = get_tree().get_first_node_in_group("Player")
 	health.changed.connect(_on_health_changed)
 	health.died.connect(_die)
@@ -66,6 +74,7 @@ func _setup_visuals() -> void:
 		model_root = TROLL_MODEL_SCENE.instantiate()
 		add_child(model_root)
 		ModelValidatorType.auto_fit_model_size(model_root, 2.5)
+		RetroMaterialStylerType.apply_to_model(model_root, Color(0.42, 0.50, 0.34), 0.92)
 
 func _setup_hp_bar() -> void:
 	# Create a SubViewport for the HP Bar UI
@@ -187,9 +196,14 @@ func _physics_process(delta: float) -> void:
 							_did_hit_player = true
 							player.take_damage(attack_damage)
 							if player.has_method("apply_knockback"):
-								var kb_dir = global_position.direction_to(player.global_position)
-								kb_dir.y = 1.0 # Knockup effect
-								player.apply_knockback(kb_dir.normalized() * 25.0)
+								var kb_dir := global_position.direction_to(player.global_position)
+								kb_dir.y = 0.0
+								if kb_dir.length_squared() > 0.001:
+									kb_dir = kb_dir.normalized()
+								player.apply_knockback(
+									kb_dir * knockback_horizontal_force
+									+ Vector3.UP * knockback_vertical_force
+								)
 			
 			if anim_player and not anim_player.is_playing():
 				if _did_hit_player:
@@ -208,7 +222,12 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 func _process_circling(delta: float, dist_to_player: float, dir_to_player: Vector3) -> void:
-	if dist_to_player <= aggro_range:
+	# After respawning inside the player's range, stay passive until the troll
+	# has first moved clear. This prevents an unavoidable instant re-aggro.
+	if not _aggro_armed:
+		if dist_to_player > aggro_range + 1.0:
+			_aggro_armed = true
+	elif dist_to_player <= aggro_range:
 		state = State.AGGRO
 		_play_anim("Move")
 		return
@@ -248,6 +267,7 @@ func take_damage(amount: int) -> void:
 	if state == State.DYING: return
 	health.take_damage(amount)
 	if state == State.CIRCLING:
+		_aggro_armed = true
 		state = State.AGGRO
 		_play_anim("Move")
 
@@ -268,21 +288,39 @@ func _die() -> void:
 	is_burning = false
 	speed_modifier = 1.0
 	_apply_material_overlay(null)
-	_play_anim("Death")
-	_set_collision_enabled(false)
+	velocity.x = 0.0
+	velocity.z = 0.0
+	_play_anim("Death", 0.1)
+	# The body must keep its floor mask while dead. Disabling the shape here made
+	# gravity pull the troll through the level. Layer 0 keeps the corpse from
+	# blocking the player and from receiving projectile collisions.
+	collision_layer = 0
+	if hp_sprite:
+		hp_sprite.visible = false
+	_spawn_death_drop()
 	get_tree().create_timer(10.0).timeout.connect(_respawn)
 
 func _respawn() -> void:
 	if not is_instance_valid(self): return
 	health.reset()
 	state = State.CIRCLING
-	_set_collision_enabled(true)
+	_aggro_armed = false
+	velocity = Vector3.ZERO
+	collision_layer = _active_collision_layer
+	if hp_sprite:
+		hp_sprite.visible = true
 	_play_anim("Move")
 
-func _set_collision_enabled(enabled: bool) -> void:
-	for child in get_children():
-		if child is CollisionShape3D:
-			child.set_deferred("disabled", not enabled)
+func _spawn_death_drop() -> void:
+	if not WORLD_ITEM_DROP_SCENE or not get_parent():
+		return
+	var drop := WORLD_ITEM_DROP_SCENE.instantiate() as WorldItemDrop
+	drop.item_data = LEATHER_ARMOR_DATA
+	get_parent().add_child(drop)
+	var side := global_transform.basis.x.normalized()
+	var origin := global_position + Vector3.UP * 1.15
+	var target := global_position + side * 1.45 + Vector3.UP * 0.06
+	drop.launch_from(origin, target)
 
 func _apply_material_overlay(mat: Material) -> void:
 	if not model_root: return

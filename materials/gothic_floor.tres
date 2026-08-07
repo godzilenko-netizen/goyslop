@@ -1,0 +1,10 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/environment/gothic_flagstone.png" id="1_floor"]
+
+[resource]
+albedo_color = Color(0.72, 0.76, 0.72, 1)
+albedo_texture = ExtResource("1_floor")
+roughness = 0.96
+texture_filter = 2
+uv1_scale = Vector3(8, 8, 8)
