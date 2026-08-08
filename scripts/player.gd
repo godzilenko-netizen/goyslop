@@ -41,6 +41,10 @@ var mana_flask: RefillableFlaskType
 var is_dead: bool = false
 var is_knocked_down: bool = false
 
+var equipped_weapon: Dictionary = {}
+var weapon_attachment: BoneAttachment3D = null
+var weapon_mesh_instance: Node3D = null
+
 var _regen_timer: float = 0.0
 
 @onready var camera:       Camera3D   = $CameraPivot/SpringArm3D/Camera3D
@@ -81,6 +85,13 @@ func _ready() -> void:
 		func() -> void: stats.apply_attribute_bonuses(attributes)
 	)
 	attributes.recalculate()  # первый пересчёт на старте
+	
+	if inventory_ui:
+		var inv_model = inventory_ui.get("inventory_model")
+		if inv_model and inv_model.has_signal("changed"):
+			inv_model.changed.connect(_on_inventory_changed)
+
+
 	stats.health_changed.connect(hud.update_hp)
 	stats.energy_changed.connect(hud.update_energy)
 	stats.experience_changed.connect(hud.update_xp)
@@ -140,9 +151,13 @@ func _setup_mixamo_animations() -> void:
 		"InjuredWalkBack": "res://models/characters/player/animations/injured/Injured Walk Backwards.fbx",
 		"Death": "res://models/characters/player/animations/reactions/Death.fbx",
 		"FallingBack": "res://models/characters/player/animations/reactions/Falling Back.fbx",
-		"GettingUp": "res://models/characters/player/animations/reactions/Getting Up.fbx"
+		"GettingUp": "res://models/characters/player/animations/reactions/Getting Up.fbx",
+		"SwordSlash1": "res://models/characters/player/animations/weapons/Stable Sword Outward Slash.fbx",
+		"SwordSlash2": "res://models/characters/player/animations/weapons/Sword And Shield Slash.fbx",
+		"SwordSlash3": "res://models/characters/player/animations/weapons/Sword And Shield Attack crit.fbx"
 	}
 	
+
 	for anim_name in anim_files:
 		var path = anim_files[anim_name]
 		if ResourceLoader.exists(path):
@@ -429,7 +444,7 @@ func add_inventory_item(item: Dictionary) -> bool:
 		return false
 	return inventory_ui.add_item(item)
 
-# --- РЎР›РЈР§РђР™РќР«Р™ Р’Р«Р‘РћР  РђРќРРњРђР¦РР РР— Р”Р’РЈРҐ РЈР”РђР РћР’ KРЈР›РђРљРћРњ ---
+# --- СЛУЧАЙНЫЙ ВЫБОР АНИМАЦИИ ИЗ ДВУХ УДАРОВ KУЛАКОМ ИЛИ МЕЧОМ ---
 func attack() -> void:
 	if is_dead or is_knocked_down: return
 	if is_attack_on_cooldown or is_attacking:
@@ -444,29 +459,41 @@ func attack() -> void:
 	if anim_player:
 		anim_player.speed_scale = 1.75
 		
-		# РџРѕРёСЃРє РґРѕСЃС‚СѓРїРЅС‹С… Р°РЅРёРјР°С†РёР№ СѓРґР°СЂРѕРІ
-		var punches: Array[String] = []
-		if anim_player.has_animation("mixamo/Punch1"):
-			punches.append("mixamo/Punch1")
-		if anim_player.has_animation("mixamo/Punch2"):
-			punches.append("mixamo/Punch2")
-			
-		if punches.size() > 0:
-			var chosen_punch = punches[randi() % punches.size()]
-			anim_player.play(chosen_punch, 0.05)
-			print("рџ’Ґ РђС‚Р°РєР° РёРіСЂРѕРєР°! РќР°РЅРѕСЃРёС‚СЃСЏ СЃР»СѓС‡Р°Р№РЅС‹Р№ СѓРґР°СЂ: ", chosen_punch)
-		
-	# Р—Р°РїСѓСЃРє РІРёР·СѓР°Р»СЊРЅРѕРіРѕ РєСѓР»РґР°СѓРЅР° РЅР° РїРµСЂРІРѕР№ РёРєРѕРЅРєРµ С…РѕС‚Р±Р°СЂР°
+		# Поиск доступных анимаций ударов
+		var attack_anims: Array[String] = []
+		var is_has_weapon: bool = not equipped_weapon.is_empty() and bool(equipped_weapon.get("is_weapon", false))
+		if is_has_weapon:
+			for anim_name in ["mixamo/SwordSlash1", "mixamo/SwordSlash2", "mixamo/SwordSlash3"]:
+				if anim_player.has_animation(anim_name):
+					attack_anims.append(anim_name)
+		if attack_anims.is_empty():
+			for anim_name in ["mixamo/Punch1", "mixamo/Punch2"]:
+				if anim_player.has_animation(anim_name):
+					attack_anims.append(anim_name)
+
+		if attack_anims.size() > 0:
+			var chosen_anim = attack_anims[randi() % attack_anims.size()]
+			anim_player.play(chosen_anim, 0.05)
+			print("💥 Атака игрока! Наносится случайный удар: ", chosen_anim)
+
+	# Запуск визуального кулдауна на первой иконке хотбара
 	hud.trigger_attack_cooldown(basic_attack_skill.cooldown)
-		
-	# РџРѕРёСЃРє РІСЂР°РіРѕРІ РІ РѕР±Р»Р°СЃС‚Рё С…РёС‚Р±РѕРєСЃР°
+
+	# Поиск врагов в области хитбокса
 	if attack_hitbox:
+		var base_dmg := basic_attack_skill.damage
+		var wpn_dmg := int(equipped_weapon.get("weapon_damage", 0)) if not equipped_weapon.is_empty() else 0
+		var total_dmg := base_dmg + wpn_dmg
+		if attributes and not equipped_weapon.is_empty():
+			var scale_factor := attributes.get_damage_scaling(equipped_weapon)
+			total_dmg = roundi(float(total_dmg) * scale_factor)
+
 		var bodies = attack_hitbox.get_overlapping_bodies()
 		for body in bodies:
 			if body.is_in_group("Enemies") and body.has_method("take_damage"):
-				body.take_damage(basic_attack_skill.damage)
-				
-	# РўР°Р№РјРµСЂ РїРµСЂРµР·Р°СЂСЏРґРєРё Рё СЃР±СЂРѕСЃ СЃРѕСЃС‚РѕСЏРЅРёСЏ Р°С‚Р°РєРё
+				body.take_damage(total_dmg)
+
+	# Таймер перезарядки и сброс состояния атаки
 	if get_tree():
 		await get_tree().create_timer(basic_attack_skill.cooldown).timeout
 	is_attacking = false
@@ -646,3 +673,35 @@ func _show_mana_warning() -> void:
 		if floating_mana_warning:
 			floating_mana_warning.manual_visibility = false
 	)
+
+func _on_inventory_changed() -> void:
+	var inv_model = inventory_ui.get("inventory_model")
+	if not inv_model:
+		return
+	var weapon_ref = inv_model.equipment_ref("weapon_1")
+	var wpn = inv_model.get_item(weapon_ref)
+	if wpn.hash() != equipped_weapon.hash():
+		equipped_weapon = wpn.duplicate()
+		_update_weapon_model()
+
+func _update_weapon_model() -> void:
+	if weapon_mesh_instance and is_instance_valid(weapon_mesh_instance):
+		weapon_mesh_instance.queue_free()
+		weapon_mesh_instance = null
+
+	if equipped_weapon.is_empty() or not equipped_weapon.get("is_weapon", false):
+		if hud and basic_attack_skill:
+			hud.update_basic_attack_icon(basic_attack_skill.icon)
+		return
+
+	var attack_icon_path = str(equipped_weapon.get("weapon_attack_icon", ""))
+	if not attack_icon_path.is_empty() and hud:
+		var tex = load(attack_icon_path) as Texture2D
+		if tex:
+			hud.update_basic_attack_icon(tex)
+	elif hud and basic_attack_skill:
+		hud.update_basic_attack_icon(basic_attack_skill.icon)
+
+func _process(_delta: float) -> void:
+	pass
+

@@ -158,6 +158,26 @@ func _build_skill_stats(skill: SkillDataType) -> Array:
 		result.append(["Эффект: %.1fс" % skill.status_duration, Color(0.7, 0.9, 1.0)])
 	return result
 
+func update_basic_attack_icon(new_icon: Texture2D) -> void:
+	if not new_icon:
+		var root_control: Control = $Control
+		var slot_node := root_control.get_node_or_null("BottomCenterPanel/HotbarContainer/Slot1")
+		if slot_node:
+			var icon_rect: TextureRect = slot_node.get_node_or_null("FistIcon")
+			if icon_rect:
+				# Возвращаем дефолтную иконку (Fist) если нужно, 
+				# но у нас она берётся из базового скилла
+				return
+				
+	var root_control: Control = $Control
+	var slot_node := root_control.get_node_or_null("BottomCenterPanel/HotbarContainer/Slot1")
+	if slot_node:
+		var icon_rect: TextureRect = slot_node.get_node_or_null("SkillIcon")
+		if not icon_rect:
+			icon_rect = slot_node.get_node_or_null("FistIcon")
+		if icon_rect:
+			icon_rect.texture = new_icon
+
 func _create_locked_slot_overlays() -> void:
 	# Заглушки на заблокированных слотах 4–8
 	var hotbar = $Control/BottomCenterPanel/HotbarContainer

@@ -138,7 +138,11 @@ func _refresh() -> void:
 		if not tex and ResourceLoader.exists(icon_path):
 			tex = load(icon_path) as Texture2D
 		_item_icon.texture = tex
+		_item_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		_item_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		_item_icon.visible = _item_icon.texture != null
+
+
 	else:
 		_item_icon.texture = null
 

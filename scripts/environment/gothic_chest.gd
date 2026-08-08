@@ -5,6 +5,7 @@ const InventoryModelType = preload("res://scripts/data/inventory_model.gd")
 const ItemDataType = preload("res://scripts/data/item_data.gd")
 const LEATHER_ARMOR_DATA = preload("res://data/items/leather_armor.tres")
 const RING_OF_STRENGTH_DATA = preload("res://data/items/ring_of_strength.tres")
+const WOODEN_SWORD_DATA = preload("res://data/items/wooden_sword.tres")
 
 const FloatingLabel = preload("res://scripts/ui/floating_label.gd")
 
@@ -57,6 +58,8 @@ func _populate_initial_loot() -> void:
 		inventory_model.add_item(RING_OF_STRENGTH_DATA.to_inventory_item())
 	if LEATHER_ARMOR_DATA:
 		inventory_model.add_item(LEATHER_ARMOR_DATA.to_inventory_item())
+	if WOODEN_SWORD_DATA:
+		inventory_model.add_item(WOODEN_SWORD_DATA.to_inventory_item())
 	inventory_model.set_gold(250)
 
 

@@ -12,6 +12,11 @@ extends Resource
 @export var icon: Texture2D
 @export var icon_path: String = ""
 
+@export_group("Weapon Data")
+@export var weapon_damage: int = 0
+@export var weapon_attack_icon: Texture2D
+@export var is_weapon: bool = false
+
 @export_group("Attribute Requirements")
 ## Минимальная Сила для экипировки (0 = нет требования)
 @export var req_str: int = 0
@@ -50,6 +55,10 @@ func to_inventory_item(quantity: int = 1) -> Dictionary:
 		"str_scaling": str_scaling,
 		"dex_scaling": dex_scaling,
 		"int_scaling": int_scaling,
+		# Weapon data
+		"is_weapon": is_weapon,
+		"weapon_damage": weapon_damage,
+		"weapon_attack_icon": weapon_attack_icon.resource_path if weapon_attack_icon else "",
 	}
 
 

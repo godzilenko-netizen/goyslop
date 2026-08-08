@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bfhm8ephfe0bv"
-path="res://.godot/imported/hp_orb_dragon_frame.png-c5971aa68ade7595d8d208852ddec41f.ctex"
+uid="uid://dg83b1ebrvjsd"
+path="res://.godot/imported/wooden_sword.png-f55e53063444c4a5f7c07e2601a8c72c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/hp_orb_dragon_frame.png"
-dest_files=["res://.godot/imported/hp_orb_dragon_frame.png-c5971aa68ade7595d8d208852ddec41f.ctex"]
+source_file="res://assets/items/wooden_sword.png"
+dest_files=["res://.godot/imported/wooden_sword.png-f55e53063444c4a5f7c07e2601a8c72c.ctex"]
 
 [params]
 

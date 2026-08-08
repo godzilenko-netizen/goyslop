@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/items/wooden_sword.png" id="1_ddwwj"]
+[ext_resource type="Script" path="res://scripts/data/item_data.gd" id="2_q4h6c"]
+
+[resource]
+script = ExtResource("2_q4h6c")
+item_id = "wooden_sword"
+display_name = "Деревянный меч"
+description = "Простой тренировочный деревянный меч. Не наносит много урона, но лучше, чем кулаки."
+equipment_slot = "weapon"
+grid_size = Vector2i(1, 3)
+icon = ExtResource("1_ddwwj")
+weapon_damage = 12
+is_weapon = true
+req_str = 5
+str_scaling = 0.15
+dex_scaling = 0.05
